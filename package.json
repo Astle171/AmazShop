@@ -1,0 +1,22 @@
+{
+  "name": "amazshop",
+  "version": "1.0.0",
+  "description": "MERN shopping cart app",
+  "main": "server.js",
+  "scripts": {
+    "start": "node backend/server"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Astle171/AmazShop.git"
+  },
+  "author": "Astle Machado",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Astle171/AmazShop/issues"
+  },
+  "homepage": "https://github.com/Astle171/AmazShop#readme",
+  "dependencies": {
+    "express": "^4.17.2"
+  }
+}
