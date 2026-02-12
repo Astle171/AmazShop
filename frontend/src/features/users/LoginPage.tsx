@@ -8,7 +8,7 @@ import { useLoginMutation } from '../../app/api/endpoints/usersApi'
 import { useAppSelector } from '../../app/hooks'
 import { getErrorMessage } from '../../utils/getErrorMessage'
 
-const LoginScreen = () => {
+const LoginPage = () => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const location = useLocation()
@@ -74,4 +74,4 @@ const LoginScreen = () => {
   )
 }
 
-export default LoginScreen
+export default LoginPage

@@ -10,7 +10,7 @@ import {
 import { useAppSelector } from '../../app/hooks'
 import { getErrorMessage } from '../../utils/getErrorMessage'
 
-const ProfileScreen = () => {
+const ProfilePage = () => {
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -113,4 +113,4 @@ const ProfileScreen = () => {
   )
 }
 
-export default ProfileScreen
+export default ProfilePage
