@@ -1,33 +1,23 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Row, Col, Image, ListGroup, Card, Button, Form } from 'react-bootstrap'
-import Rating from '../components/Rating'
+import Rating from './components/Rating'
 import { useParams, useNavigate } from 'react-router-dom'
-import { LinkContainer } from 'react-router-bootstrap'
-import axios from 'axios'
-import { useDispatch, useSelector } from 'react-redux'
-import { listProductDetails } from '../actions/productActions'
-import { Loader } from '../components/Loader'
-import { Message } from '../components/Message'
+import { Loader } from '../../components/common/Loader'
+import { Message } from '../../components/common/Message'
+import { useGetProductByIdQuery } from '../../app/api/endpoints/productsApi'
 
 const ProductScreen = () => {
   const [qty, setQty] = useState(1)
   const params = useParams()
   const navigate = useNavigate()
-  const dispatch = useDispatch()
-  const productDetails = useSelector((state) => state.productDetails)
-  const { loading, error, product } = productDetails
+  const {
+    data: product,
+    isLoading,
+    error,
+  } = useGetProductByIdQuery(params.id)
 
-  useEffect(() => {
-    // const fetchProduct = async () => {
-    //   const { data } = await axios.get(`/api/products/${params.id}`)
-
-    //   setProduct(data)
-    // }
-
-    // fetchProduct()
-    dispatch(listProductDetails(params.id))
-  }, [dispatch])
+  const errorMessage = error?.data?.message || error?.error
 
   const addToCartHandler = () => {
     navigate(`/cart/${params.id}?qty=${qty}`)
@@ -38,11 +28,11 @@ const ProductScreen = () => {
       <Link className='btn btn-light my-3' to='/'>
         Go back
       </Link>
-      {loading ? (
+      {isLoading ? (
         <Loader />
       ) : error ? (
-        <Message variant='danger'>{error}</Message>
-      ) : (
+        <Message variant='danger'>{errorMessage}</Message>
+      ) : product ? (
         <Row>
           <Col md={6}>
             <Image src={product.image} alt={product.name} fluid />
@@ -120,7 +110,7 @@ const ProductScreen = () => {
             </Card>
           </Col>
         </Row>
-      )}
+      ) : null}
     </>
   )
 }

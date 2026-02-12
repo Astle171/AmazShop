@@ -3,12 +3,11 @@ import { LinkContainer } from 'react-router-bootstrap'
 import { useDispatch, useSelector } from 'react-redux'
 import { Nav, Navbar, Container, NavDropdown } from 'react-bootstrap'
 import { Link } from 'react-router-dom'
-import { logout } from '../actions/userActions'
+import { logout } from '../../features/auth/authSlice'
 
 const Header = () => {
   const dispatch = useDispatch()
-  const userLogin = useSelector((state) => state.userLogin)
-  const { userInfo } = userLogin
+  const { userInfo } = useSelector((state) => state.auth)
 
   const logutHandler = () => {
     dispatch(logout())

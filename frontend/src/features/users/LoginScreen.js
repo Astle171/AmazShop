@@ -1,46 +1,43 @@
 import React, { useState, useEffect } from 'react'
-import {
-  Link,
-  useLocation,
-  useNavigate,
-  useSearchParams,
-} from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { Form, Button, Row, Col } from 'react-bootstrap'
-import { useDispatch, useSelector } from 'react-redux'
-import { createBrowserHistory } from 'history'
-import { Message } from '../components/Message.js'
-import { Loader } from '../components/Loader.js'
-import FormContainer from '../components/FormContainer'
-import { login } from '../actions/userActions'
+import { useSelector } from 'react-redux'
+import { Message } from '../../components/common/Message'
+import { Loader } from '../../components/common/Loader'
+import FormContainer from '../../components/common/FormContainer'
+import { useLoginMutation } from '../../app/api/endpoints/usersApi'
 
 const LoginScreen = () => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const location = useLocation()
-  let history = createBrowserHistory()
-  const dispatch = useDispatch()
+  const navigate = useNavigate()
+  const [login, { isLoading, error }] = useLoginMutation()
 
-  const userLogin = useSelector((state) => state.userLogin)
-  const { loading, error, userInfo } = userLogin
+  const { userInfo } = useSelector((state) => state.auth)
 
   const redirect = location.search ? location.search.split('=')[1] : '/'
 
   useEffect(() => {
     if (userInfo) {
-      history.push(redirect)
+      navigate(redirect)
     }
-  }, [history, userInfo, redirect])
+  }, [navigate, userInfo, redirect])
 
-  const submitHandler = (e) => {
+  const submitHandler = async (e) => {
     e.preventDefault()
-    dispatch(login(email, password))
+    await login({ email, password })
   }
 
   return (
     <FormContainer>
       <h1>Sign In</h1>
-      {error && <Message variant='danger'>{error}</Message>}
-      {loading && <Loader />}
+      {error && (
+        <Message variant='danger'>
+          {error?.data?.message || error?.error}
+        </Message>
+      )}
+      {isLoading && <Loader />}
       <Form onSubmit={submitHandler}>
         <Form.Group controlId='email'>
           <Form.Label>Email Address</Form.Label>

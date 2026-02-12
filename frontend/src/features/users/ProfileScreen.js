@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react'
-import { useLocation } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { Form, Button, Row, Col } from 'react-bootstrap'
-import { useDispatch, useSelector } from 'react-redux'
-import { createBrowserHistory } from 'history'
-import { Message } from '../components/Message.js'
-import { Loader } from '../components/Loader.js'
-import { getUserDetails, updateUserProfile } from '../actions/userActions'
+import { useSelector } from 'react-redux'
+import { Message } from '../../components/common/Message'
+import { Loader } from '../../components/common/Loader'
+import {
+  useGetUserProfileQuery,
+  useUpdateUserProfileMutation,
+} from '../../app/api/endpoints/usersApi'
 
 const ProfileScreen = () => {
   const [name, setName] = useState('')
@@ -13,39 +15,34 @@ const ProfileScreen = () => {
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [message, setMessage] = useState(null)
-  const location = useLocation()
-  let history = createBrowserHistory()
-  const dispatch = useDispatch()
-
-  const userDetails = useSelector((state) => state.userDetails)
-  const { loading, error, user } = userDetails
-
-  const userLogin = useSelector((state) => state.userLogin)
-  const { userInfo } = userLogin
-
-  const userUpdateProfile = useSelector((state) => state.userUpdateProfile)
-  const { success } = userUpdateProfile
+  const navigate = useNavigate()
+  const { userInfo } = useSelector((state) => state.auth)
+  const [updateUserProfile, { isLoading: isUpdating, isSuccess, error: updateError }] =
+    useUpdateUserProfileMutation()
+  const {
+    data: user,
+    isLoading,
+    error,
+  } = useGetUserProfileQuery(undefined, { skip: !userInfo })
 
   useEffect(() => {
     if (!userInfo) {
-      history.push('/login')
-    } else {
-      if (!user.name) {
-        dispatch(getUserDetails('profile'))
-        // dispatch(listMyOrders())
-      } else {
-        setName(user.name)
-        setEmail(user.email)
-      }
+      navigate('/login')
+      return
     }
-  }, [dispatch, history, userInfo, user])
+    if (user?.name) {
+      setName(user.name)
+      setEmail(user.email)
+    }
+  }, [navigate, userInfo, user])
 
-  const submitHandler = (e) => {
+  const submitHandler = async (e) => {
     e.preventDefault()
     if (password !== confirmPassword) {
       setMessage('Passwords do not match')
     } else {
-      dispatch(updateUserProfile({ id: user._id, name, email, password }))
+      setMessage(null)
+      await updateUserProfile({ id: user?._id, name, email, password })
     }
   }
 
@@ -54,9 +51,18 @@ const ProfileScreen = () => {
       <Col md={3}>
         <h2>User Profile</h2>
         {message && <Message variant='danger'>{message}</Message>}
-        {error && <Message variant='danger'>{error}</Message>}
-        {success && <Message variant='success'>Profile Updated</Message>}
-        {loading && <Loader />}
+        {error && (
+          <Message variant='danger'>
+            {error?.data?.message || error?.error}
+          </Message>
+        )}
+        {updateError && (
+          <Message variant='danger'>
+            {updateError?.data?.message || updateError?.error}
+          </Message>
+        )}
+        {isSuccess && <Message variant='success'>Profile Updated</Message>}
+        {(isLoading || isUpdating) && <Loader />}
         <Form onSubmit={submitHandler}>
           <Form.Group controlId='name'>
             <Form.Label>Name</Form.Label>

@@ -1,17 +1,11 @@
 import React, { useState, useEffect } from 'react'
-import {
-  Link,
-  useLocation,
-  useNavigate,
-  useSearchParams,
-} from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { Form, Button, Row, Col } from 'react-bootstrap'
-import { useDispatch, useSelector } from 'react-redux'
-import { createBrowserHistory } from 'history'
-import { Message } from '../components/Message.js'
-import { Loader } from '../components/Loader.js'
-import FormContainer from '../components/FormContainer'
-import { register } from '../actions/userActions'
+import { useSelector } from 'react-redux'
+import { Message } from '../../components/common/Message'
+import { Loader } from '../../components/common/Loader'
+import FormContainer from '../../components/common/FormContainer'
+import { useRegisterMutation } from '../../app/api/endpoints/usersApi'
 
 const RegisterScreen = () => {
   const [name, setName] = useState('')
@@ -20,34 +14,38 @@ const RegisterScreen = () => {
   const [confirmPassword, setConfirmPassword] = useState('')
   const [message, setMessage] = useState(null)
   const location = useLocation()
-  let history = createBrowserHistory()
-  const dispatch = useDispatch()
+  const navigate = useNavigate()
+  const [register, { isLoading, error }] = useRegisterMutation()
 
-  const userRegister = useSelector((state) => state.userRegister)
-  const { loading, error, userInfo } = userRegister
+  const { userInfo } = useSelector((state) => state.auth)
 
   const redirect = location.search ? location.search.split('=')[1] : '/'
 
   useEffect(() => {
     if (userInfo) {
-      history.push(redirect)
+      navigate(redirect)
     }
-  }, [history, userInfo, redirect])
+  }, [navigate, userInfo, redirect])
 
-  const submitHandler = (e) => {
+  const submitHandler = async (e) => {
     e.preventDefault()
     if (password !== confirmPassword) {
       setMessage('Passwords do not match')
+      return
     }
-    dispatch(register(name, email, password))
+    await register({ name, email, password })
   }
 
   return (
     <FormContainer>
       <h1>Sign Up</h1>
       {message && <Message variant='danger'>{message}</Message>}
-      {error && <Message variant='danger'>{error}</Message>}
-      {loading && <Loader />}
+      {error && (
+        <Message variant='danger'>
+          {error?.data?.message || error?.error}
+        </Message>
+      )}
+      {isLoading && <Loader />}
       <Form onSubmit={submitHandler}>
         <Form.Group controlId='name'>
           <Form.Label>Name</Form.Label>

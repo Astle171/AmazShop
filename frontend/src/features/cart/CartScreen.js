@@ -1,13 +1,14 @@
 import React, { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { Message } from '../components/Message.js'
+import { Message } from '../../components/common/Message'
 import { Link, useParams, useNavigate, useSearchParams } from 'react-router-dom'
 import { Row, Col, ListGroup, Image, Form, Button, Card } from 'react-bootstrap'
-import { addToCart, removeFromCart } from '../actions/cartActions'
+import { addItem, removeItem } from './cartSlice'
+import { useLazyGetProductByIdQuery } from '../../app/api/endpoints/productsApi'
 
-export const CartSc = () => {
+const CartScreen = () => {
   const params = useParams()
-  const Navigate = useNavigate()
+  const navigate = useNavigate()
   const productId = params.id
 
   const [searchParams] = useSearchParams()
@@ -15,24 +16,39 @@ export const CartSc = () => {
   const qty = searchParams.get('qty') ? Number(searchParams.get('qty')) : 1
 
   const dispatch = useDispatch()
+  const [triggerGetProduct, { data: productData }] =
+    useLazyGetProductByIdQuery()
 
   const cart = useSelector((state) => state.cart)
   const { cartItems } = cart
 
-  console.log(cartItems)
-
   useEffect(() => {
     if (productId) {
-      dispatch(addToCart(productId, qty))
+      triggerGetProduct(productId)
     }
-  }, [dispatch, productId, qty])
+  }, [productId, triggerGetProduct])
+
+  useEffect(() => {
+    if (productData) {
+      dispatch(
+        addItem({
+          product: productData._id,
+          name: productData.name,
+          image: productData.image,
+          price: productData.price,
+          countInStock: productData.countInStock,
+          qty,
+        })
+      )
+    }
+  }, [dispatch, productData, qty])
 
   const removeFromCartHandler = (id) => {
-    dispatch(removeFromCart(id))
+    dispatch(removeItem(id))
   }
 
   const checkoutHandler = () => {
-    Navigate('/login?redirect=shipping')
+    navigate('/login?redirect=shipping')
   }
 
   return (
@@ -61,7 +77,10 @@ export const CartSc = () => {
                       value={item.qty}
                       onChange={(e) =>
                         dispatch(
-                          addToCart(item.product, Number(e.target.value))
+                          addItem({
+                            ...item,
+                            qty: Number(e.target.value),
+                          })
                         )
                       }
                     >
@@ -116,3 +135,5 @@ export const CartSc = () => {
     </Row>
   )
 }
+
+export default CartScreen
