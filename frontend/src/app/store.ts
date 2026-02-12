@@ -3,7 +3,7 @@ import { apiSlice } from './api/apiSlice'
 import authReducer from '../features/auth/authSlice'
 import cartReducer from '../features/cart/cartSlice'
 
-const store = configureStore({
+export const store = configureStore({
   reducer: {
     [apiSlice.reducerPath]: apiSlice.reducer,
     auth: authReducer,
@@ -13,5 +13,9 @@ const store = configureStore({
     getDefaultMiddleware().concat(apiSlice.middleware),
   devTools: process.env.NODE_ENV !== 'production',
 })
+
+// Infer RootState and AppDispatch types from store
+export type RootState = ReturnType<typeof store.getState>
+export type AppDispatch = typeof store.dispatch
 
 export default store

@@ -2,12 +2,17 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 import { Card } from 'react-bootstrap'
 import Rating from './Rating'
+import type { Product as ProductType } from '../../../types'
 
-const Product = ({ product }) => {
+type ProductProps = {
+  product: ProductType
+}
+
+const Product = ({ product }: ProductProps) => {
   return (
     <Card className='my-3 p-3 rounded'>
       <Link to={`/product/${product._id}`}>
-        <Card.Img src={product.image} varient='top' />
+        <Card.Img src={product.image} variant='top' />
       </Link>
       <Card.Body>
         <Link to={`/product/${product._id}`} style={{ textDecoration: 'none' }}>

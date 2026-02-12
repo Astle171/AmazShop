@@ -4,6 +4,7 @@ import Product from './components/Product'
 import { Loader } from '../../components/common/Loader'
 import { Message } from '../../components/common/Message'
 import { useGetProductsQuery } from '../../app/api/endpoints/productsApi'
+import { getErrorMessage } from '../../utils/getErrorMessage'
 
 const HomeScreen = () => {
   const {
@@ -12,7 +13,7 @@ const HomeScreen = () => {
     error,
   } = useGetProductsQuery()
 
-  const errorMessage = error?.data?.message || error?.error
+  const errorMessage = getErrorMessage(error)
 
   return (
     <>

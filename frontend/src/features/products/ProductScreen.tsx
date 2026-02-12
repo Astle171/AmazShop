@@ -6,21 +6,24 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { Loader } from '../../components/common/Loader'
 import { Message } from '../../components/common/Message'
 import { useGetProductByIdQuery } from '../../app/api/endpoints/productsApi'
+import { getErrorMessage } from '../../utils/getErrorMessage'
 
 const ProductScreen = () => {
   const [qty, setQty] = useState(1)
-  const params = useParams()
+  const { id } = useParams<{ id?: string }>()
   const navigate = useNavigate()
   const {
     data: product,
     isLoading,
     error,
-  } = useGetProductByIdQuery(params.id)
+  } = useGetProductByIdQuery(id ?? '', { skip: !id })
 
-  const errorMessage = error?.data?.message || error?.error
+  const errorMessage = getErrorMessage(error)
 
   const addToCartHandler = () => {
-    navigate(`/cart/${params.id}?qty=${qty}`)
+    if (id) {
+      navigate(`/cart/${id}?qty=${qty}`)
+    }
   }
 
   return (
@@ -82,7 +85,7 @@ const ProductScreen = () => {
                         <Form.Control
                           as='select'
                           value={qty}
-                          onChange={(e) => setQty(e.target.value)}
+                          onChange={(e) => setQty(Number(e.target.value))}
                         >
                           {[...Array(product.countInStock).keys()].map((x) => (
                             <option key={x + 1} value={x + 1}>

@@ -1,10 +1,19 @@
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
+import {
+  createApi,
+  fetchBaseQuery,
+} from '@reduxjs/toolkit/query/react'
+import type {
+  BaseQueryFn,
+  FetchArgs,
+  FetchBaseQueryError,
+} from '@reduxjs/toolkit/query'
 import { logout } from '../../features/auth/authSlice'
+import type { RootState } from '../store'
 
 const baseQuery = fetchBaseQuery({
   baseUrl: '/api',
   prepareHeaders: (headers, { getState }) => {
-    const token = getState().auth.userInfo?.token
+    const token = (getState() as RootState).auth.userInfo?.token
     if (token) {
       headers.set('Authorization', `Bearer ${token}`)
     }
@@ -12,7 +21,11 @@ const baseQuery = fetchBaseQuery({
   },
 })
 
-const baseQueryWithAuth = async (args, api, extraOptions) => {
+const baseQueryWithAuth: BaseQueryFn<
+  string | FetchArgs,
+  unknown,
+  FetchBaseQueryError
+> = async (args, api, extraOptions) => {
   const result = await baseQuery(args, api, extraOptions)
   if (result.error && result.error.status === 401) {
     api.dispatch(logout())
@@ -23,6 +36,6 @@ const baseQueryWithAuth = async (args, api, extraOptions) => {
 export const apiSlice = createApi({
   reducerPath: 'api',
   baseQuery: baseQueryWithAuth,
-  tagTypes: ['Product', 'User', 'Order'],
+  tagTypes: ['Product', 'User'],
   endpoints: () => ({}), // Endpoints injected in feature slices
 })

@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { Form, Button, Row, Col } from 'react-bootstrap'
-import { useSelector } from 'react-redux'
 import { Message } from '../../components/common/Message'
 import { Loader } from '../../components/common/Loader'
 import FormContainer from '../../components/common/FormContainer'
 import { useLoginMutation } from '../../app/api/endpoints/usersApi'
+import { useAppSelector } from '../../app/hooks'
+import { getErrorMessage } from '../../utils/getErrorMessage'
 
 const LoginScreen = () => {
   const [email, setEmail] = useState('')
@@ -14,9 +15,10 @@ const LoginScreen = () => {
   const navigate = useNavigate()
   const [login, { isLoading, error }] = useLoginMutation()
 
-  const { userInfo } = useSelector((state) => state.auth)
+  const { userInfo } = useAppSelector((state) => state.auth)
 
-  const redirect = location.search ? location.search.split('=')[1] : '/'
+  const redirect =
+    new URLSearchParams(location.search).get('redirect') || '/'
 
   useEffect(() => {
     if (userInfo) {
@@ -24,7 +26,7 @@ const LoginScreen = () => {
     }
   }, [navigate, userInfo, redirect])
 
-  const submitHandler = async (e) => {
+  const submitHandler = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     await login({ email, password })
   }
@@ -32,11 +34,7 @@ const LoginScreen = () => {
   return (
     <FormContainer>
       <h1>Sign In</h1>
-      {error && (
-        <Message variant='danger'>
-          {error?.data?.message || error?.error}
-        </Message>
-      )}
+      {error && <Message variant='danger'>{getErrorMessage(error)}</Message>}
       {isLoading && <Loader />}
       <Form onSubmit={submitHandler}>
         <Form.Group controlId='email'>

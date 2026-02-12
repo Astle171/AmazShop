@@ -1,25 +1,27 @@
 import React, { useState, useEffect } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { Form, Button, Row, Col } from 'react-bootstrap'
-import { useSelector } from 'react-redux'
 import { Message } from '../../components/common/Message'
 import { Loader } from '../../components/common/Loader'
 import FormContainer from '../../components/common/FormContainer'
 import { useRegisterMutation } from '../../app/api/endpoints/usersApi'
+import { useAppSelector } from '../../app/hooks'
+import { getErrorMessage } from '../../utils/getErrorMessage'
 
 const RegisterScreen = () => {
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
-  const [message, setMessage] = useState(null)
+  const [message, setMessage] = useState<string | null>(null)
   const location = useLocation()
   const navigate = useNavigate()
   const [register, { isLoading, error }] = useRegisterMutation()
 
-  const { userInfo } = useSelector((state) => state.auth)
+  const { userInfo } = useAppSelector((state) => state.auth)
 
-  const redirect = location.search ? location.search.split('=')[1] : '/'
+  const redirect =
+    new URLSearchParams(location.search).get('redirect') || '/'
 
   useEffect(() => {
     if (userInfo) {
@@ -27,7 +29,7 @@ const RegisterScreen = () => {
     }
   }, [navigate, userInfo, redirect])
 
-  const submitHandler = async (e) => {
+  const submitHandler = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     if (password !== confirmPassword) {
       setMessage('Passwords do not match')
@@ -40,11 +42,7 @@ const RegisterScreen = () => {
     <FormContainer>
       <h1>Sign Up</h1>
       {message && <Message variant='danger'>{message}</Message>}
-      {error && (
-        <Message variant='danger'>
-          {error?.data?.message || error?.error}
-        </Message>
-      )}
+      {error && <Message variant='danger'>{getErrorMessage(error)}</Message>}
       {isLoading && <Loader />}
       <Form onSubmit={submitHandler}>
         <Form.Group controlId='name'>

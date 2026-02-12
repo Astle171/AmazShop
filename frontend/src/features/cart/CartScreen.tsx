@@ -1,26 +1,25 @@
 import React, { useEffect } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
 import { Message } from '../../components/common/Message'
 import { Link, useParams, useNavigate, useSearchParams } from 'react-router-dom'
 import { Row, Col, ListGroup, Image, Form, Button, Card } from 'react-bootstrap'
 import { addItem, removeItem } from './cartSlice'
 import { useLazyGetProductByIdQuery } from '../../app/api/endpoints/productsApi'
+import { useAppDispatch, useAppSelector } from '../../app/hooks'
 
 const CartScreen = () => {
-  const params = useParams()
+  const { id } = useParams<{ id?: string }>()
   const navigate = useNavigate()
-  const productId = params.id
+  const productId = id
 
   const [searchParams] = useSearchParams()
 
   const qty = searchParams.get('qty') ? Number(searchParams.get('qty')) : 1
 
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   const [triggerGetProduct, { data: productData }] =
     useLazyGetProductByIdQuery()
 
-  const cart = useSelector((state) => state.cart)
-  const { cartItems } = cart
+  const { cartItems } = useAppSelector((state) => state.cart)
 
   useEffect(() => {
     if (productId) {
@@ -43,7 +42,7 @@ const CartScreen = () => {
     }
   }, [dispatch, productData, qty])
 
-  const removeFromCartHandler = (id) => {
+  const removeFromCartHandler = (id: string) => {
     dispatch(removeItem(id))
   }
 

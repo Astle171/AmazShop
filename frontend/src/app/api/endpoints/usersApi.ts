@@ -1,9 +1,10 @@
 import { apiSlice } from '../apiSlice'
 import { setCredentials } from '../../../features/auth/authSlice'
+import type { UserInfo, UserProfile } from '../../../types'
 
 export const usersApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
-    login: builder.mutation({
+    login: builder.mutation<UserInfo, { email: string; password: string }>({
       query: (credentials) => ({
         url: 'users/login',
         method: 'POST',
@@ -18,7 +19,10 @@ export const usersApi = apiSlice.injectEndpoints({
         }
       },
     }),
-    register: builder.mutation({
+    register: builder.mutation<
+      UserInfo,
+      { name: string; email: string; password: string }
+    >({
       query: (payload) => ({
         url: 'users',
         method: 'POST',
@@ -33,11 +37,14 @@ export const usersApi = apiSlice.injectEndpoints({
         }
       },
     }),
-    getUserProfile: builder.query({
+    getUserProfile: builder.query<UserProfile, void>({
       query: () => 'users/profile',
       providesTags: ['User'],
     }),
-    updateUserProfile: builder.mutation({
+    updateUserProfile: builder.mutation<
+      UserInfo,
+      { id?: string; name: string; email: string; password?: string }
+    >({
       query: (payload) => ({
         url: 'users/profile',
         method: 'PUT',
