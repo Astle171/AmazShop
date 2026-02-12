@@ -53,7 +53,7 @@ const LoginScreen = () => {
         </Form.Group>
 
         <Form.Group controlId='password'>
-          <Form.Label>Password Address</Form.Label>
+          <Form.Label>Password</Form.Label>
           <Form.Control
             type='password'
             placeholder='Enter password'
@@ -62,7 +62,7 @@ const LoginScreen = () => {
           ></Form.Control>
         </Form.Group>
 
-        <Button type='submit' variant='primary'>
+        <Button type='submit' variant='primary' className='my-3'>
           Sign In
         </Button>
       </Form>
