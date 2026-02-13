@@ -3,6 +3,7 @@ import dotenv from 'dotenv'
 import path from 'path'
 import { fileURLToPath } from 'url'
 import colors from 'colors'
+import cors from 'cors'
 import connectDB from './config/db.js'
 import productRoutes from './routes/productRoutes.js'
 import userRoutes from './routes/userRoutes.js'
@@ -17,6 +18,7 @@ connectDB()
 
 const app = express()
 
+app.use(cors({ origin: true, credentials: true }))
 app.use(express.json())
 
 app.get('/', (req, res) => {
