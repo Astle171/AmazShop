@@ -6,7 +6,7 @@ import { Message } from '../../components/common/Message'
 import { useGetProductsQuery } from '../../app/api/endpoints/productsApi'
 import { getErrorMessage } from '../../utils/getErrorMessage'
 
-const HomeScreen = () => {
+const HomePage = () => {
   const {
     data: products = [],
     isLoading,
@@ -14,6 +14,7 @@ const HomeScreen = () => {
   } = useGetProductsQuery()
 
   const errorMessage = getErrorMessage(error)
+  
 
   return (
     <>
@@ -37,4 +38,4 @@ const HomeScreen = () => {
   )
 }
 
-export default HomeScreen
+export default HomePage

@@ -8,7 +8,7 @@ import { Message } from '../../components/common/Message'
 import { useGetProductByIdQuery } from '../../app/api/endpoints/productsApi'
 import { getErrorMessage } from '../../utils/getErrorMessage'
 
-const ProductScreen = () => {
+const ProductDetailsPage = () => {
   const [qty, setQty] = useState(1)
   const { id } = useParams<{ id?: string }>()
   const navigate = useNavigate()
@@ -118,4 +118,4 @@ const ProductScreen = () => {
   )
 }
 
-export default ProductScreen
+export default ProductDetailsPage

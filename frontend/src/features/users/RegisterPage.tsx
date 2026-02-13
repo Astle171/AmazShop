@@ -8,7 +8,7 @@ import { useRegisterMutation } from '../../app/api/endpoints/usersApi'
 import { useAppSelector } from '../../app/hooks'
 import { getErrorMessage } from '../../utils/getErrorMessage'
 
-const RegisterScreen = () => {
+const RegisterPage = () => {
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -102,4 +102,4 @@ const RegisterScreen = () => {
   )
 }
 
-export default RegisterScreen
+export default RegisterPage

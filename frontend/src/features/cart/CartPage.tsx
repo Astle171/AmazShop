@@ -6,7 +6,7 @@ import { addItem, removeItem } from './cartSlice'
 import { useLazyGetProductByIdQuery } from '../../app/api/endpoints/productsApi'
 import { useAppDispatch, useAppSelector } from '../../app/hooks'
 
-const CartScreen = () => {
+const CartPage = () => {
   const { id } = useParams<{ id?: string }>()
   const navigate = useNavigate()
   const productId = id
@@ -135,4 +135,4 @@ const CartScreen = () => {
   )
 }
 
-export default CartScreen
+export default CartPage
