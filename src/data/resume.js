@@ -1,10 +1,10 @@
 export const RESUME_DATA = {
   name: "Astle Machado",
   role: "Senior Software Engineer",
-  tagline: "Crafted With Care, Coded With Clarity",
+  tagline: "Building With Purpose, Coding With Precision",
   subTagline: "Full Stack Engineer (Web \u2726 Cloud \u2726 Performance)",
   summary:
-    "With over 5+ years of professional experience across product and service-based companies, I've optimized global e-commerce platforms, built enterprise microservices, and delivered high-impact features used by millions. I am dedicated to writing performant, scalable code that drives real business outcomes.",
+    "From Zero to One and beyond to million, I have been there, building & scaling tech for multiple startups. With over 5+ years of professional experience, I am dedicated to delivering high-quality software solutions that meet the needs of businesses and end-users alike.",
   contact: {
     email: "astle1999machado@gmail.com",
     phone: "+91 9765727902",

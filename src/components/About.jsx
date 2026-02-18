@@ -6,19 +6,19 @@ import { RESUME_DATA } from "@/data/resume";
 
 const cards = [
   {
-    title: "Performance Obsessed",
+    title: "From Idea to Scalable Product",
     icon: <Zap className="text-yellow-400" size={32} />,
-    desc: "Slashed P95 checkout latency by 42%, eliminated 70% of render-blocking resources, and optimized Core Web Vitals across an entire global e-commerce platform at Cimpress.",
+    desc: "I don't just write code, I build solutions. From brainstorming to deployment, I have experience working across the entire product lifecycle.",
   },
   {
-    title: "Full Stack, End to End",
+    title: "Building Scalable Web Apps",
     icon: <Cpu className="text-pink-400" size={32} />,
-    desc: "From React frontends to Node.js APIs, Kafka microservices to AWS infrastructure\u2014I've built and shipped across the full stack at both product and service-based companies.",
+    desc: "Expert in React, Node, and AWS with a proven record of building high-performance applications, focusing on scalability and cost-efficiency.",
   },
   {
-    title: "Product & Enterprise Scale",
+    title: "Bridging Tech & Strategy",
     icon: <Globe className="text-blue-400" size={32} />,
-    desc: "Experience spanning global e-commerce at Cimpress (pens.com, 23+ locales) and enterprise systems at LTIMindtree\u2014building for millions of users with reliability at the core.",
+    desc: "Great engineering isn't just about code\u2014it's about making the right decisions. I bring a product and business-first mindset to engineering.",
   },
 ];
 
@@ -33,30 +33,21 @@ function ScrollCard({ card, index }) {
   const opacity = useTransform(scrollYProgress, [0, 0.4, 1], [0, 0.3, 1]);
   const scale = useTransform(scrollYProgress, [0, 1], [0.9, 1]);
 
-  const accents = [
-    "from-purple-500 to-pink-500",
-    "from-pink-500 to-orange-400",
-    "from-blue-500 to-cyan-400",
-  ];
-
   return (
     <motion.div
       ref={ref}
       style={{ y, opacity, scale }}
-      className="relative bg-[var(--bg-card)] rounded-2xl border border-[var(--border-color)] hover:border-[var(--color-accent)]/50 transition duration-300 group hover:-translate-y-2 shadow-lg hover:shadow-xl overflow-hidden will-change-transform"
+      className="bg-[var(--bg-card)] p-8 rounded-2xl border border-[var(--border-color)] hover:border-[var(--color-accent)]/50 transition duration-300 group hover:-translate-y-2 shadow-sm will-change-transform"
     >
-      <div className={`h-1 bg-gradient-to-r ${accents[index % 3]} opacity-70 group-hover:opacity-100 transition-opacity`} />
-      <div className="p-8">
-        <div className="mb-6 bg-[var(--bg-secondary)] w-16 h-16 rounded-full flex items-center justify-center mx-auto group-hover:scale-110 transition-transform ring-1 ring-[var(--border-color)] group-hover:ring-[var(--color-accent)]/50">
-          {card.icon}
-        </div>
-        <h3 className="text-[var(--text-primary)] font-bold mb-3 text-lg">
-          {card.title}
-        </h3>
-        <p className="text-[var(--text-secondary)] text-sm leading-relaxed">
-          {card.desc}
-        </p>
+      <div className="mb-6 bg-[var(--bg-secondary)] w-16 h-16 rounded-full flex items-center justify-center mx-auto group-hover:scale-110 transition-transform ring-1 ring-[var(--border-color)] group-hover:ring-[var(--color-accent)]/50">
+        {card.icon}
       </div>
+      <h3 className="text-[var(--text-primary)] font-bold mb-3 text-lg">
+        {card.title}
+      </h3>
+      <p className="text-[var(--text-secondary)] text-sm leading-relaxed">
+        {card.desc}
+      </p>
     </motion.div>
   );
 }
@@ -87,14 +78,14 @@ export default function About() {
             className="text-4xl md:text-5xl font-bold"
             style={{ y: headingY, opacity: headingOpacity }}
           >
-            <span className="text-[var(--text-primary)]">Crafted With </span>
+            <span className="text-[var(--text-primary)]">Building With </span>
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-500">
-              Care
+              Purpose
             </span>
             <br />
-            <span className="text-[var(--text-primary)]">Coded With </span>
+            <span className="text-[var(--text-primary)]">Coding With </span>
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-500">
-              Clarity
+              Precision
             </span>
           </motion.h2>
 
