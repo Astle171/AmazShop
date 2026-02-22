@@ -1,0 +1,130 @@
+@import "tailwindcss";
+
+@theme inline {
+  --color-bg: #F5F0E8;
+  --color-bg-light: #F8F6F4;
+  --color-accent: #C9963A;
+  --color-accent-light: rgba(201, 150, 58, 0.2);
+  --color-main: #2D241E;
+  --color-secondary: #5C544E;
+  --color-surface: #FFFFFF;
+
+  --font-sans: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+body {
+  background-color: var(--color-bg);
+  color: var(--color-main);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(45, 36, 30, 0.1);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(45, 36, 30, 0.2);
+}
+
+.hover-lift {
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
+    box-shadow 0.3s ease;
+}
+.hover-lift:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 20px 40px -10px rgba(45, 36, 30, 0.1);
+}
+
+.card-reveal-btn {
+  opacity: 0;
+  transform: translateY(10px);
+  transition: all 0.3s ease;
+}
+.group:hover .card-reveal-btn {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.nav-glass {
+  background: rgba(245, 240, 232, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.search-focus:focus-within {
+  box-shadow: 0 0 0 2px var(--color-accent);
+  border-color: var(--color-accent);
+}
+
+.bento-grid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 1.5rem;
+  grid-auto-rows: minmax(180px, auto);
+}
+
+@media (max-width: 1024px) {
+  .bento-grid {
+    grid-template-columns: repeat(12, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .bento-grid {
+    grid-template-columns: 1fr;
+    grid-auto-rows: auto;
+  }
+}
+
+.shadow-soft {
+  box-shadow: 0 10px 30px -10px rgba(45, 36, 30, 0.08);
+}
+
+.rating-star {
+  color: var(--color-accent);
+}
+
+.plp-sidebar {
+  display: none;
+  width: 16rem;
+  flex-shrink: 0;
+}
+
+@media (min-width: 1024px) {
+  .plp-sidebar {
+    display: block;
+  }
+}
+
+.pdp-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 3rem;
+}
+
+@media (min-width: 768px) {
+  .pdp-layout {
+    flex-direction: row;
+    gap: 3rem;
+  }
+  .pdp-gallery {
+    width: 58%;
+    flex-shrink: 0;
+  }
+  .pdp-info {
+    flex: 1;
+  }
+  .pdp-info-inner {
+    position: sticky;
+    top: 7rem;
+  }
+}
