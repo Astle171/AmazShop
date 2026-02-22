@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useCallback, useEffect } from "react";
+import { Suspense, useState, useMemo, useCallback, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import FilterSidebar from "@/components/plp/FilterSidebar";
 import ActiveFilters, { type FilterTag } from "@/components/plp/ActiveFilters";
@@ -19,6 +19,30 @@ const SORT_OPTIONS = [
 ];
 
 export default function SearchPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex gap-8">
+          <div className="w-[260px] shrink-0 hidden lg:block" />
+          <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className="bg-white rounded-[24px] p-4 animate-pulse">
+                <div className="h-56 rounded-2xl bg-gray-100 mb-4" />
+                <div className="h-3 w-16 bg-gray-100 rounded mb-2" />
+                <div className="h-5 w-3/4 bg-gray-100 rounded mb-3" />
+                <div className="h-6 w-20 bg-gray-100 rounded" />
+              </div>
+            ))}
+          </div>
+        </div>
+      }
+    >
+      <SearchContent />
+    </Suspense>
+  );
+}
+
+function SearchContent() {
   const searchParams = useSearchParams();
   const query = searchParams.get("q") || "";
   const categoryParam = searchParams.get("category") || "";
