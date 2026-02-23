@@ -45,14 +45,14 @@ export default function ProductInfo({ product }: ProductInfoProps) {
       </div>
 
       {/* Title */}
-      <h1 className="text-4xl md:text-5xl font-black mb-4 leading-none tracking-tight">
+      <h1 className="text-2xl sm:text-3xl md:text-5xl font-black mb-3 md:mb-4 leading-none tracking-tight">
         {product.name}
       </h1>
-      <p className="text-secondary text-lg mb-8">{product.description}</p>
+      <p className="text-secondary text-base md:text-lg mb-4 sm:mb-8">{product.description}</p>
 
       {/* Price */}
-      <div className="flex items-baseline gap-4 mb-10">
-        <span className="text-4xl font-black">
+      <div className="flex items-baseline gap-4 mb-6 sm:mb-10">
+        <span className="text-2xl sm:text-4xl font-black">
           ${product.price.toLocaleString("en-US", { minimumFractionDigits: 2 })}
         </span>
         {product.originalPrice && (
@@ -63,7 +63,7 @@ export default function ProductInfo({ product }: ProductInfoProps) {
       </div>
 
       {/* Variants */}
-      <div className="space-y-8 mb-10">
+      <div className="space-y-5 sm:space-y-8 mb-6 sm:mb-10">
         {/* Finish selector */}
         {product.finishes.length > 0 && (
           <div>
@@ -125,7 +125,7 @@ export default function ProductInfo({ product }: ProductInfoProps) {
       </div>
 
       {/* Trust badges */}
-      <div className="mt-8 flex items-center justify-center gap-8 py-6 border-t border-main/5">
+      <div className="mt-6 sm:mt-8 flex flex-wrap items-center justify-center gap-4 sm:gap-8 py-4 sm:py-6 border-t border-main/5">
         <div className="flex items-center gap-2 text-xs font-bold text-secondary">
           <ShippingIcon className="text-accent" />
           Free Shipping

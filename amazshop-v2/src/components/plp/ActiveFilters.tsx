@@ -33,9 +33,9 @@ export default function ActiveFilters({
           {filter.label}
           <button
             onClick={() => onRemove(filter)}
-            className={
+            className={`min-w-[24px] min-h-[24px] flex items-center justify-center ${
               filter.type === "brand" ? "hover:text-accent" : "text-accent"
-            }
+            }`}
           >
             ✕
           </button>

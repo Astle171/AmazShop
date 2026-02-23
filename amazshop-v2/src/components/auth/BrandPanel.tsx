@@ -26,6 +26,20 @@ function GridPattern() {
 
 export default function BrandPanel() {
   return (
+    <>
+    {/* Mobile brand header */}
+    <div className="lg:hidden bg-main px-5 py-4 flex items-center gap-3">
+      <Link href="/">
+        <Image
+          src="/logo-cropped.png"
+          alt="AmazShop"
+          width={120}
+          height={37}
+          className="h-8 w-auto object-contain brightness-0 invert"
+        />
+      </Link>
+      <span className="text-white/40 text-xs font-medium ml-auto">Elevate your Digital Life</span>
+    </div>
     <div className="brand-side hidden lg:flex flex-col justify-between p-16 w-1/2 bg-main relative overflow-hidden">
       <div className="relative z-20">
         <Link href="/" className="flex items-center gap-3 group">
@@ -72,5 +86,6 @@ export default function BrandPanel() {
 
       <div className="relative z-20" />
     </div>
+    </>
   );
 }

@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import type { PLPCategory } from "@/types";
 
 interface FilterSidebarProps {
@@ -12,6 +13,8 @@ interface FilterSidebarProps {
   selectedRating: number | null;
   onRatingChange: (rating: number | null) => void;
   maxPrice?: number;
+  isOpen?: boolean;
+  onClose?: () => void;
 }
 
 export default function FilterSidebar({
@@ -24,6 +27,8 @@ export default function FilterSidebar({
   selectedRating,
   onRatingChange,
   maxPrice = 2000,
+  isOpen = false,
+  onClose,
 }: FilterSidebarProps) {
   const renderStars = (filled: number, total = 5) => {
     return Array.from({ length: total }, (_, i) =>
@@ -31,19 +36,27 @@ export default function FilterSidebar({
     ).join("");
   };
 
-  return (
-    <aside className="plp-sidebar">
-      <div className="sticky top-28 space-y-8">
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => { document.body.style.overflow = ""; };
+  }, [isOpen]);
+
+  const filterContent = (
+    <div className="space-y-8">
         {/* Categories */}
         <div>
           <h3 className="font-black text-sm uppercase tracking-widest mb-4">
             Categories
           </h3>
-          <ul className="space-y-2 text-sm font-medium text-secondary">
+          <ul className="space-y-1 text-sm font-medium text-secondary">
             {categories.map((cat) => (
               <li
                 key={cat.slug}
-                className={`cursor-pointer transition-colors ${
+                className={`cursor-pointer transition-colors py-2 ${
                   cat.active
                     ? "text-accent flex items-center justify-between"
                     : "hover:text-main"
@@ -142,7 +155,38 @@ export default function FilterSidebar({
             ))}
           </div>
         </div>
-      </div>
-    </aside>
+    </div>
+  );
+
+  return (
+    <>
+      {/* Desktop sidebar */}
+      <aside className="plp-sidebar">
+        <div className="sticky top-28">
+          {filterContent}
+        </div>
+      </aside>
+
+      {/* Mobile drawer */}
+      {isOpen && (
+        <div className="fixed inset-0 z-50 lg:hidden">
+          <div className="absolute inset-0 bg-black/40" onClick={onClose} />
+          <div className="absolute right-0 top-0 bottom-0 w-[85%] max-w-sm bg-bg overflow-y-auto animate-slide-in-right">
+            <div className="sticky top-0 bg-bg z-10 flex items-center justify-between px-5 py-4 border-b border-main/10">
+              <h2 className="text-lg font-black">Filters</h2>
+              <button
+                onClick={onClose}
+                className="w-10 h-10 rounded-full bg-main/5 flex items-center justify-center text-main font-bold"
+              >
+                ✕
+              </button>
+            </div>
+            <div className="p-5">
+              {filterContent}
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 }

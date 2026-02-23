@@ -43,7 +43,7 @@ export default function Pagination({
   const visiblePages = getVisiblePages();
 
   return (
-    <div className="mt-12 flex justify-center items-center gap-2">
+    <div className="mt-8 md:mt-12 flex justify-center items-center gap-2 overflow-x-auto max-w-full py-2">
       <button
         onClick={() => onPageChange(Math.max(1, currentPage - 1))}
         disabled={currentPage === 1}

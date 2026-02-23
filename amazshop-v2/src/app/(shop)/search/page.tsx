@@ -194,8 +194,10 @@ function SearchContent() {
       ? categoryParam.charAt(0).toUpperCase() + categoryParam.slice(1)
       : "All Products";
 
+  const [filterOpen, setFilterOpen] = useState(false);
+
   return (
-    <div className="flex gap-8">
+    <div className="flex gap-4 lg:gap-8">
       <FilterSidebar
         categories={categories}
         brands={brands}
@@ -206,13 +208,15 @@ function SearchContent() {
         selectedRating={selectedRating}
         onRatingChange={setSelectedRating}
         maxPrice={maxPriceSlider}
+        isOpen={filterOpen}
+        onClose={() => setFilterOpen(false)}
       />
 
       <section className="flex-1 min-w-0">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-6 gap-4">
           <div>
-            <h1 className="text-3xl font-black tracking-tight mb-1">{title}</h1>
+            <h1 className="text-2xl md:text-3xl font-black tracking-tight mb-1">{title}</h1>
             <p className="text-sm text-secondary">
               {loading
                 ? "Loading products…"
@@ -221,6 +225,14 @@ function SearchContent() {
                   : `Showing ${showingStart}–${showingEnd} of ${totalResults} results`}
             </p>
           </div>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setFilterOpen(true)}
+              className="lg:hidden flex items-center gap-2 h-10 px-4 bg-white border border-main/10 rounded-xl text-sm font-bold hover:border-accent transition-colors"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>
+              Filters
+            </button>
           <div className="flex items-center gap-3 bg-white border border-main/5 p-1 rounded-xl">
             <span className="text-xs font-bold text-secondary pl-3">Sort by:</span>
             <select
@@ -232,6 +244,7 @@ function SearchContent() {
                 <option key={opt}>{opt}</option>
               ))}
             </select>
+          </div>
           </div>
         </div>
 
