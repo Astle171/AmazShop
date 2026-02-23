@@ -35,6 +35,10 @@ body {
   background: rgba(45, 36, 30, 0.2);
 }
 
+.stepper-btn:active {
+  transform: scale(0.9);
+}
+
 .hover-lift {
   transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
     box-shadow 0.3s ease;

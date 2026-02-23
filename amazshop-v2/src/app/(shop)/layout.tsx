@@ -1,5 +1,6 @@
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
+import PLPSessionManager from "@/components/plp/PLPSessionManager";
 
 export default function ShopLayout({
   children,
@@ -8,6 +9,7 @@ export default function ShopLayout({
 }) {
   return (
     <>
+      <PLPSessionManager />
       <Navbar />
       <main className="flex-1 max-w-[1400px] w-full mx-auto px-4 md:px-6 py-4 md:py-8">
         {children}

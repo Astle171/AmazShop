@@ -3,7 +3,11 @@ import Google from "next-auth/providers/google";
 import Credentials from "next-auth/providers/credentials";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { compare } from "bcryptjs";
+import { cookies } from "next/headers";
 import { prisma } from "@/lib/prisma";
+import { mergeGuestCart } from "@/lib/cart-service";
+
+const ANON_COOKIE = "amazshop-anon-id";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   adapter: PrismaAdapter(prisma),
@@ -54,6 +58,20 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         session.user.id = token.id as string;
       }
       return session;
+    },
+  },
+  events: {
+    async signIn({ user }) {
+      if (!user.id) return;
+      try {
+        const jar = await cookies();
+        const anonId = jar.get(ANON_COOKIE)?.value;
+        if (anonId) {
+          await mergeGuestCart(user.id, anonId);
+        }
+      } catch {
+        // merge is best-effort; the client can retry via /api/cart/merge
+      }
     },
   },
 });

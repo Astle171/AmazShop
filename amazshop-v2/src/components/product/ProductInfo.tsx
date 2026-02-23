@@ -1,8 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import StarRating from "@/components/common/StarRating";
 import { ShoppingBagIcon } from "@/components/icons";
+import { useCart } from "@/context/CartContext";
+import { buildVariantString } from "@/data/cart-data";
 import type { ProductDetail } from "@/types";
 
 interface ProductInfoProps {
@@ -27,12 +30,36 @@ function ShieldIcon({ className }: { className?: string }) {
 }
 
 export default function ProductInfo({ product }: ProductInfoProps) {
+  const router = useRouter();
+  const { addItem } = useCart();
   const [selectedFinish, setSelectedFinish] = useState(
     product.finishes.findIndex((f) => f.active) ?? 0
   );
   const [selectedVariant, setSelectedVariant] = useState(
     product.variants.findIndex((v) => v.active) ?? 0
   );
+  const [addError, setAddError] = useState<string | null>(null);
+
+  const handleAddToCart = () => {
+    setAddError(null);
+    const finish = product.finishes[selectedFinish]?.name;
+    const variant = product.variants[selectedVariant]?.name;
+    const variantStr = buildVariantString(finish, variant);
+    const result = addItem({
+      productId: product._id,
+      variant: variantStr,
+      quantity: 1,
+    });
+    if (result.success) {
+      router.push("/cart");
+      return;
+    }
+    if (result.reason === "out_of_stock") {
+      setAddError("This product is out of stock.");
+    } else if (result.reason === "exceeds_stock") {
+      setAddError(`Only ${product.countInStock} left in stock.`);
+    }
+  };
 
   return (
     <div className="pdp-info-inner">
@@ -115,8 +142,16 @@ export default function ProductInfo({ product }: ProductInfoProps) {
 
       {/* CTA Buttons */}
       <div className="flex flex-col gap-4">
-        <button className="w-full bg-main text-white h-16 rounded-2xl font-black text-lg tracking-wide hover:bg-accent shadow-xl shadow-black/10 transition-all flex items-center justify-center gap-3">
-          ADD TO CART
+        {addError && (
+          <p className="text-sm font-bold text-red-500">{addError}</p>
+        )}
+        <button
+          type="button"
+          onClick={handleAddToCart}
+          disabled={product.countInStock <= 0}
+          className="w-full bg-main text-white h-16 rounded-2xl font-black text-lg tracking-wide hover:bg-accent shadow-xl shadow-black/10 transition-all flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {product.countInStock <= 0 ? "OUT OF STOCK" : "ADD TO CART"}
           <ShoppingBagIcon />
         </button>
         <button className="w-full bg-white border border-main/10 text-main h-16 rounded-2xl font-black text-sm tracking-widest uppercase hover:border-accent transition-all">

@@ -1,6 +1,10 @@
+"use client";
+
 import Link from "next/link";
 import Image from "next/image";
 import { HeartIcon } from "@/components/icons";
+import { useCart } from "@/context/CartContext";
+import { addToPLPSession, isInPLPSession } from "@/lib/plp-session";
 import type { Product } from "@/types";
 
 function StarDisplay({
@@ -29,6 +33,39 @@ interface PLPProductCardProps {
 }
 
 export default function PLPProductCard({ product }: PLPProductCardProps) {
+  const { addItem, removeItem, updateQuantity, items } = useCart();
+
+  const cartItem = items.find(
+    (i) => i.productId === product._id && i.variant === "Standard"
+  );
+  const inCartQty = cartItem?.quantity ?? 0;
+  const isInCart = inCartQty > 0;
+  const canAddMore = inCartQty < product.countInStock;
+  const showStepper = isInPLPSession(product._id) && isInCart;
+
+  const handleAdd = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (product.countInStock <= 0) return;
+    if (isInCart && cartItem) {
+      updateQuantity(cartItem.id, inCartQty + 1);
+    } else {
+      addItem({ productId: product._id, variant: "Standard", quantity: 1 });
+    }
+    addToPLPSession(product._id);
+  };
+
+  const handleDecrement = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!cartItem) return;
+    if (inCartQty <= 1) {
+      removeItem(cartItem.id);
+    } else {
+      updateQuantity(cartItem.id, inCartQty - 1);
+    }
+  };
+
   return (
     <article className="group bg-white rounded-[24px] p-4 cursor-pointer hover-lift relative overflow-hidden flex flex-col">
       {/* Badge */}
@@ -77,20 +114,81 @@ export default function PLPProductCard({ product }: PLPProductCardProps) {
           </h3>
         </Link>
         <StarDisplay rating={product.rating} numReviews={product.numReviews} />
-        <div className="mt-auto flex items-center justify-between">
+        <div className="mt-auto space-y-3">
           <div className="flex items-baseline gap-2">
             <span className="font-black text-xl">
               ${product.price.toLocaleString("en-US", { minimumFractionDigits: 2 })}
             </span>
             {product.originalPrice && (
-              <span className="text-xs text-gray-400 line-through decoration-red-500">
+              <span className="text-xs text-secondary line-through">
                 ${product.originalPrice.toLocaleString("en-US", { minimumFractionDigits: 2 })}
               </span>
             )}
           </div>
-          <button className="w-10 h-10 bg-main text-white rounded-full flex items-center justify-center hover:bg-accent transition-colors text-lg font-bold">
-            +
-          </button>
+          <div className="flex items-center justify-end">
+          {showStepper ? (
+            <div
+              className="flex items-center bg-bg rounded-full p-1 shrink-0"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <button
+                type="button"
+                onClick={handleDecrement}
+                className="w-9 h-9 rounded-full flex items-center justify-center hover:bg-white transition-colors stepper-btn text-main"
+                aria-label="Decrease quantity"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="3"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <line x1="5" y1="12" x2="19" y2="12" />
+                </svg>
+              </button>
+              <span className="w-8 text-center font-bold text-sm text-main">
+                {inCartQty}
+              </span>
+              <button
+                type="button"
+                onClick={handleAdd}
+                disabled={!canAddMore}
+                className="w-9 h-9 rounded-full bg-main text-white flex items-center justify-center shadow-md stepper-btn disabled:opacity-50 disabled:cursor-not-allowed"
+                aria-label="Increase quantity"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="3"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <line x1="12" y1="5" x2="12" y2="19" />
+                  <line x1="5" y1="12" x2="19" y2="12" />
+                </svg>
+              </button>
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={handleAdd}
+              disabled={product.countInStock <= 0}
+              className="w-10 h-10 bg-main text-white rounded-full flex items-center justify-center hover:bg-accent transition-colors text-lg font-bold disabled:opacity-50 disabled:cursor-not-allowed shrink-0"
+              aria-label="Add to cart"
+            >
+              +
+            </button>
+          )}
+          </div>
         </div>
       </div>
     </article>

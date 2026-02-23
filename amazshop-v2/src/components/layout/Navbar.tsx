@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useState, useRef, useEffect } from "react";
 import { useSession, signOut } from "next-auth/react";
 import { SearchIcon, HeartIcon, ShoppingBagIcon } from "@/components/icons";
+import { useCart } from "@/context/CartContext";
 
 function UserAvatar({ name, image }: { name?: string | null; image?: string | null }) {
   if (image) {
@@ -37,6 +38,7 @@ function UserAvatar({ name, image }: { name?: string | null; image?: string | nu
 export default function Navbar() {
   const router = useRouter();
   const { data: session, status } = useSession();
+  const { itemCount } = useCart();
   const [query, setQuery] = useState("");
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -144,9 +146,11 @@ export default function Navbar() {
             className="h-10 w-10 md:h-12 md:w-12 rounded-full bg-main text-white flex items-center justify-center shadow-lg shadow-orange-900/10 hover:bg-accent hover:-translate-y-1 transition-all relative"
           >
             <ShoppingBagIcon />
-            <span className="absolute -top-1 -right-1 h-5 w-5 bg-accent border-2 border-bg rounded-full text-[10px] font-bold flex items-center justify-center">
-              2
-            </span>
+            {itemCount > 0 && (
+              <span className="absolute -top-1 -right-1 h-5 w-5 bg-accent border-2 border-bg rounded-full text-[10px] font-bold flex items-center justify-center">
+                {itemCount > 99 ? "99+" : itemCount}
+              </span>
+            )}
           </Link>
         </div>
       </div>
