@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import ProductCard from "@/components/product/ProductCard";
+import { MotionGrid, MotionCard } from "@/components/motion/ProductGrid";
 import type { Product } from "@/types";
 
 interface TrendingSectionProps {
@@ -52,11 +53,16 @@ export default function TrendingSection({ products }: TrendingSectionProps) {
         </Link>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+      <MotionGrid
+        animationKey={activeFilter}
+        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8"
+      >
         {displayProducts.map((product) => (
-          <ProductCard key={product._id} product={product} />
+          <MotionCard key={product._id}>
+            <ProductCard product={product} />
+          </MotionCard>
         ))}
-      </div>
+      </MotionGrid>
     </section>
   );
 }

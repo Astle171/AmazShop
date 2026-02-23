@@ -31,6 +31,7 @@ interface CartContextValue {
   removeItem: (id: string) => void;
   updateQuantity: (id: string, quantity: number) => boolean;
   saveForLater: (id: string) => void;
+  clearCart: () => void;
 }
 
 const CartContext = createContext<CartContextValue | null>(null);
@@ -113,6 +114,19 @@ export function CartProvider({ children }: { children: ReactNode }) {
   itemsRef.current = items;
 
   const prevSessionUserId = useRef<string | undefined>(undefined);
+  const pendingOps = useRef(0);
+  const addTimers = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map());
+  const addAccum = useRef<Map<string, number>>(new Map());
+  const updateTimers = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map());
+
+  const DEBOUNCE_MS = 350;
+
+  const reconcile = useCallback((serverItems: CartItem[] | null) => {
+    pendingOps.current -= 1;
+    if (serverItems && pendingOps.current === 0) {
+      setItems(serverItems);
+    }
+  }, []);
 
   // Initial hydration from API
   useEffect(() => {
@@ -169,20 +183,31 @@ export function CartProvider({ children }: { children: ReactNode }) {
       ];
     });
 
-    // Persist to server, then reconcile with server state
-    apiAddItem(productId, variant, quantity).then((serverItems) => {
-      if (serverItems) setItems(serverItems);
-    });
+    // Debounce: accumulate rapid adds into one API call
+    const key = `${productId}::${variant}`;
+    const prev_accum = addAccum.current.get(key) ?? 0;
+    addAccum.current.set(key, prev_accum + quantity);
+
+    const existing_timer = addTimers.current.get(key);
+    if (existing_timer) clearTimeout(existing_timer);
+
+    const timer = setTimeout(() => {
+      const totalQty = addAccum.current.get(key) ?? quantity;
+      addAccum.current.delete(key);
+      addTimers.current.delete(key);
+      pendingOps.current += 1;
+      apiAddItem(productId, variant, totalQty).then(reconcile);
+    }, DEBOUNCE_MS);
+    addTimers.current.set(key, timer);
 
     return { success: true };
-  }, []);
+  }, [reconcile]);
 
   const removeItem = useCallback((id: string) => {
     setItems((prev) => prev.filter((i) => i.id !== id));
-    apiRemoveItem(id).then((serverItems) => {
-      if (serverItems) setItems(serverItems);
-    });
-  }, []);
+    pendingOps.current += 1;
+    apiRemoveItem(id).then(reconcile);
+  }, [reconcile]);
 
   const updateQuantity = useCallback(
     (id: string, quantity: number): boolean => {
@@ -193,18 +218,25 @@ export function CartProvider({ children }: { children: ReactNode }) {
       const maxQty = product.countInStock;
       const newQty = Math.max(1, Math.min(quantity, maxQty));
 
-      // Optimistic
+      // Optimistic update immediately
       setItems((prev) =>
         prev.map((i) => (i.id === id ? { ...i, quantity: newQty } : i))
       );
 
-      apiUpdateQuantity(id, newQty).then((serverItems) => {
-        if (serverItems) setItems(serverItems);
-      });
+      // Debounce: only send the final quantity after rapid clicks settle
+      const existing_timer = updateTimers.current.get(id);
+      if (existing_timer) clearTimeout(existing_timer);
+
+      const timer = setTimeout(() => {
+        updateTimers.current.delete(id);
+        pendingOps.current += 1;
+        apiUpdateQuantity(id, newQty).then(reconcile);
+      }, DEBOUNCE_MS);
+      updateTimers.current.set(id, timer);
 
       return true;
     },
-    []
+    [reconcile]
   );
 
   const saveForLater = useCallback(
@@ -213,6 +245,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
     },
     [removeItem]
   );
+
+  const clearCart = useCallback(() => {
+    setItems([]);
+  }, []);
 
   const itemCount = items.reduce((sum, i) => sum + i.quantity, 0);
   const subtotal = items.reduce((sum, i) => {
@@ -228,6 +264,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     removeItem,
     updateQuantity,
     saveForLater,
+    clearCart,
   };
 
   return (

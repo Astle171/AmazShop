@@ -6,6 +6,7 @@ import FilterSidebar from "@/components/plp/FilterSidebar";
 import ActiveFilters, { type FilterTag } from "@/components/plp/ActiveFilters";
 import PLPProductCard from "@/components/plp/PLPProductCard";
 import Pagination from "@/components/plp/Pagination";
+import { MotionGrid, MotionCard } from "@/components/motion/ProductGrid";
 import { searchProducts } from "@/lib/api/products";
 import type { Product, PLPCategory } from "@/types";
 
@@ -157,6 +158,11 @@ function SearchContent() {
     return filteredProducts.slice(start, start + ITEMS_PER_PAGE);
   }, [filteredProducts, currentPage]);
 
+  const gridKey = useMemo(
+    () => paginatedProducts.map((p) => p._id).join(","),
+    [paginatedProducts]
+  );
+
   const showingStart = totalResults === 0 ? 0 : (currentPage - 1) * ITEMS_PER_PAGE + 1;
   const showingEnd = Math.min(currentPage * ITEMS_PER_PAGE, totalResults);
 
@@ -294,11 +300,16 @@ function SearchContent() {
 
         {/* Product Grid */}
         {!loading && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <MotionGrid
+            animationKey={gridKey}
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
+          >
             {paginatedProducts.map((product) => (
-              <PLPProductCard key={product._id} product={product} />
+              <MotionCard key={product._id}>
+                <PLPProductCard product={product} />
+              </MotionCard>
             ))}
-          </div>
+          </MotionGrid>
         )}
 
         {!loading && totalResults === 0 && (

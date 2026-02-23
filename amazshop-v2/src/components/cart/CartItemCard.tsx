@@ -1,5 +1,6 @@
 "use client";
 
+import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
 import type { CartItem } from "@/data/cart-data";
@@ -48,6 +49,8 @@ function ProductIcon({ category }: { category: string }) {
   );
 }
 
+const tapSpring = { type: "spring" as const, stiffness: 400, damping: 15 };
+
 interface CartItemCardProps {
   item: CartItem;
   onRemove: () => void;
@@ -82,10 +85,18 @@ export default function CartItemCard({
   const canIncrease = item.quantity < maxQty;
 
   return (
-    <div className="bg-white rounded-[32px] p-6 flex flex-col md:flex-row gap-8 hover-lift">
+    <motion.div
+      className="bg-white rounded-2xl md:rounded-[32px] p-4 md:p-6 flex flex-col sm:flex-row gap-4 md:gap-8 group"
+      whileHover={{
+        y: -4,
+        boxShadow:
+          "0 20px 60px -12px rgba(45, 36, 30, 0.15), 0 8px 24px -8px rgba(45, 36, 30, 0.08)",
+      }}
+      transition={{ type: "spring", stiffness: 300, damping: 25 }}
+    >
       <Link
         href={`/product/${product._id}`}
-        className="w-full md:w-48 h-48 bg-bg-light rounded-2xl flex items-center justify-center relative group shrink-0 overflow-hidden"
+        className="w-full sm:w-36 md:w-48 h-36 md:h-48 bg-bg-light rounded-xl md:rounded-2xl flex items-center justify-center relative shrink-0 overflow-hidden"
       >
         {product.image ? (
           <Image
@@ -99,26 +110,34 @@ export default function CartItemCard({
           <ProductIcon category={product.category} />
         )}
       </Link>
+
       <div className="flex-1 flex flex-col justify-between">
         <div>
           <div className="flex justify-between items-start mb-2">
             <Link href={`/product/${product._id}`}>
-              <h3 className="text-xl font-bold hover:text-accent transition-colors">
+              <h3 className="text-base md:text-xl font-bold hover:text-accent transition-colors">
                 {product.name}
               </h3>
             </Link>
-            <span className="font-black text-xl">
-              ${product.price.toLocaleString("en-US", { minimumFractionDigits: 2 })}
+            <span className="font-black text-base md:text-xl">
+              $
+              {product.price.toLocaleString("en-US", {
+                minimumFractionDigits: 2,
+              })}
             </span>
           </div>
           <p className="text-sm text-accent font-bold mb-4">{item.variant}</p>
+
+          {/* Quantity stepper — fades in on hover (desktop), always visible on mobile */}
           <div className="flex items-center gap-4">
             <div className="flex items-center bg-bg rounded-full p-1">
-              <button
+              <motion.button
                 type="button"
                 onClick={() => onQuantityChange(item.quantity - 1)}
                 disabled={item.quantity <= 1}
-                className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-white transition-all stepper-btn disabled:opacity-50 disabled:cursor-not-allowed"
+                whileTap={{ scale: 0.85 }}
+                transition={tapSpring}
+                className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -133,15 +152,19 @@ export default function CartItemCard({
                 >
                   <line x1="5" y1="12" x2="19" y2="12" />
                 </svg>
-              </button>
+              </motion.button>
               <span className="w-10 text-center font-bold text-sm">
                 {item.quantity}
               </span>
-              <button
+              <motion.button
                 type="button"
-                onClick={() => canIncrease && onQuantityChange(item.quantity + 1)}
+                onClick={() =>
+                  canIncrease && onQuantityChange(item.quantity + 1)
+                }
                 disabled={!canIncrease}
-                className="w-8 h-8 rounded-full bg-main text-white flex items-center justify-center shadow-md stepper-btn disabled:opacity-50 disabled:cursor-not-allowed"
+                whileTap={{ scale: 0.85 }}
+                transition={tapSpring}
+                className="w-8 h-8 rounded-full bg-main text-white flex items-center justify-center shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -157,13 +180,14 @@ export default function CartItemCard({
                   <line x1="12" y1="5" x2="12" y2="19" />
                   <line x1="5" y1="12" x2="19" y2="12" />
                 </svg>
-              </button>
+              </motion.button>
             </div>
             <span className="text-xs text-secondary font-medium">
               {maxQty > 0 ? "In Stock" : "Out of Stock"}
             </span>
           </div>
         </div>
+
         <div className="flex items-center gap-6 mt-6 md:mt-0">
           <button
             type="button"
@@ -208,6 +232,6 @@ export default function CartItemCard({
           </button>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }
