@@ -1,15 +1,25 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { signIn } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { ArrowRightIcon } from "@/components/icons";
 import BrandPanel from "@/components/auth/BrandPanel";
 import GoogleIcon from "@/components/auth/GoogleIcon";
 
 export default function LoginPage() {
+  return (
+    <Suspense>
+      <LoginPageContent />
+    </Suspense>
+  );
+}
+
+function LoginPageContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get("callbackUrl") || "/";
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -30,7 +40,7 @@ export default function LoginPage() {
       if (result?.error) {
         setError("Invalid email or password.");
       } else {
-        router.push("/");
+        router.push(callbackUrl);
         router.refresh();
       }
     } catch {
@@ -41,7 +51,7 @@ export default function LoginPage() {
   };
 
   const handleGoogleSignIn = () => {
-    signIn("google", { callbackUrl: "/" });
+    signIn("google", { callbackUrl });
   };
 
   return (
@@ -160,7 +170,7 @@ export default function LoginPage() {
             <p className="text-sm font-medium text-secondary">
               Don&apos;t have an account?
               <Link
-                href="/signup"
+                href={callbackUrl !== "/" ? `/signup?callbackUrl=${encodeURIComponent(callbackUrl)}` : "/signup"}
                 className="text-main font-black underline underline-offset-4 hover:text-accent transition-colors ml-1"
               >
                 Create Account

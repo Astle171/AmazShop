@@ -8,17 +8,19 @@ datasource db {
 }
 
 model User {
-  id            String    @id @default(cuid())
-  name          String?
-  email         String?   @unique
-  emailVerified DateTime?
-  image         String?
-  password      String?
-  accounts      Account[]
-  sessions      Session[]
-  cart          Cart?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  id               String    @id @default(cuid())
+  name             String?
+  email            String?   @unique
+  emailVerified    DateTime?
+  image            String?
+  password         String?
+  stripeCustomerId String?   @unique
+  accounts         Account[]
+  sessions         Session[]
+  cart              Cart?
+  orders           Order[]
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
 }
 
 model Cart {
@@ -40,6 +42,47 @@ model CartItem {
   cart      Cart   @relation(fields: [cartId], references: [id], onDelete: Cascade)
 
   @@unique([cartId, productId, variant])
+}
+
+model Order {
+  id                String      @id @default(cuid())
+  userId            String
+  stripePaymentId   String      @unique
+  stripeInvoiceId   String?     @unique
+  status            OrderStatus @default(PENDING)
+  subtotal          Int
+  shipping          Int         @default(0)
+  tax               Int         @default(0)
+  total             Int
+  couponCode        String?
+  shippingFirstName String?
+  shippingLastName  String?
+  shippingAddress   String?
+  shippingCity      String?
+  shippingPostal    String?
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+  items             OrderItem[]
+  user              User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model OrderItem {
+  id          String @id @default(cuid())
+  orderId     String
+  productId   String
+  productName String
+  variant     String @default("Standard")
+  quantity    Int
+  unitPrice   Int
+  order       Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+}
+
+enum OrderStatus {
+  PENDING
+  PAID
+  SHIPPED
+  DELIVERED
+  CANCELLED
 }
 
 model Account {

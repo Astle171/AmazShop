@@ -2,6 +2,9 @@
 
 import Link from "next/link";
 import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
+import { useSession } from "next-auth/react";
+import RollingPrice from "@/components/motion/RollingPrice";
 import {
   getSuggestedCoupons,
   computeOrderTotals,
@@ -70,9 +73,11 @@ export default function OrderSummary({
   onApplyCoupon,
   onRemoveCoupon,
 }: OrderSummaryProps) {
+  const { data: session } = useSession();
   const [inputValue, setInputValue] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [suggestionsOpen, setSuggestionsOpen] = useState(false);
+  const isLoggedIn = !!session?.user;
 
   const totals = computeOrderTotals(subtotal, appliedCoupon);
 
@@ -113,7 +118,7 @@ export default function OrderSummary({
       <div className="space-y-4 mb-6">
         <div className="flex justify-between font-medium">
           <span className="text-secondary">Subtotal ({itemCount} items)</span>
-          <span className="font-bold text-main">${fmt(subtotal)}</span>
+          <RollingPrice value={subtotal} className="font-bold text-main" />
         </div>
 
         {appliedCoupon && totals.subtotalDiscount > 0 && (
@@ -122,7 +127,7 @@ export default function OrderSummary({
               Discount ({appliedCoupon.code})
             </span>
             <span className="text-green-600 font-bold">
-              −${fmt(totals.subtotalDiscount)}
+              −<RollingPrice value={totals.subtotalDiscount} className="font-bold" />
             </span>
           </div>
         )}
@@ -139,15 +144,13 @@ export default function OrderSummary({
               <span className="text-green-600 font-bold">FREE</span>
             </span>
           ) : (
-            <span className="text-main font-bold">
-              ${fmt(totals.shippingAfterDiscount)}
-            </span>
+            <RollingPrice value={totals.shippingAfterDiscount} className="text-main font-bold" />
           )}
         </div>
 
         <div className="flex justify-between font-medium">
           <span className="text-secondary">Tax estimate</span>
-          <span className="text-main">${fmt(totals.taxEstimate)}</span>
+          <RollingPrice value={totals.taxEstimate} className="text-main" />
         </div>
       </div>
 
@@ -319,42 +322,39 @@ export default function OrderSummary({
       <div className="border-t border-main/5 pt-6 mb-8">
         <div className="flex justify-between items-end">
           <span className="font-bold text-secondary text-lg">Total</span>
-          <span className="font-black text-3xl tracking-tight">
-            ${fmt(totals.total)}
-          </span>
+          <RollingPrice
+            value={totals.total}
+            className="font-black text-3xl tracking-tight"
+          />
         </div>
       </div>
 
-      {/* CTAs */}
-      <Link
-        href="/checkout"
-        className="w-full h-14 bg-main text-white rounded-full font-black text-base tracking-wide hover:bg-accent hover:-translate-y-0.5 transition-all flex items-center justify-center gap-3 shadow-xl shadow-main/10 mb-3"
+      {/* CTA — subtle pulse to guide user's eye */}
+      <motion.div
+        animate={{ scale: [1, 1.015, 1] }}
+        transition={{ duration: 2.5, repeat: Infinity, repeatDelay: 4, ease: "easeInOut" }}
       >
-        Proceed to Checkout
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="18"
-          height="18"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="3"
-          strokeLinecap="round"
-          strokeLinejoin="round"
+        <Link
+          href={isLoggedIn ? "/checkout" : "/login?callbackUrl=/checkout"}
+          className="w-full h-14 bg-main text-white rounded-full font-black text-base tracking-wide hover:bg-accent hover:-translate-y-0.5 transition-all flex items-center justify-center gap-3 shadow-xl shadow-main/10 mb-5"
         >
-          <line x1="5" y1="12" x2="19" y2="12" />
-          <polyline points="12 5 19 12 12 19" />
-        </svg>
-      </Link>
-
-      <button
-        type="button"
-        className="w-full h-14 bg-white text-main rounded-full font-bold text-sm border-2 border-main/10 hover:border-main/20 transition-all flex items-center justify-center gap-1.5 mb-5"
-      >
-        <span className="font-black text-[#003087] italic">Pay</span>
-        <span className="font-black text-[#009CDE] italic">Pal</span>
-        <span className="ml-1">Checkout</span>
-      </button>
+          {isLoggedIn ? "Proceed to Checkout" : "Sign in & Checkout"}
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="3"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <line x1="5" y1="12" x2="19" y2="12" />
+            <polyline points="12 5 19 12 12 19" />
+          </svg>
+        </Link>
+      </motion.div>
 
       <Link
         href="/search"

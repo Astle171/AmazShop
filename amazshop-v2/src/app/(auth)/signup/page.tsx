@@ -1,15 +1,25 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { signIn } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { ArrowRightIcon } from "@/components/icons";
 import BrandPanel from "@/components/auth/BrandPanel";
 import GoogleIcon from "@/components/auth/GoogleIcon";
 
 export default function SignUpPage() {
+  return (
+    <Suspense>
+      <SignUpPageContent />
+    </Suspense>
+  );
+}
+
+function SignUpPageContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get("callbackUrl") || "/";
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -55,9 +65,9 @@ export default function SignUpPage() {
       });
 
       if (result?.error) {
-        router.push("/login");
+        router.push(`/login?callbackUrl=${encodeURIComponent(callbackUrl)}`);
       } else {
-        router.push("/");
+        router.push(callbackUrl);
         router.refresh();
       }
     } catch {
@@ -68,7 +78,7 @@ export default function SignUpPage() {
   };
 
   const handleGoogleSignIn = () => {
-    signIn("google", { callbackUrl: "/" });
+    signIn("google", { callbackUrl });
   };
 
   return (
@@ -207,7 +217,7 @@ export default function SignUpPage() {
             <p className="text-sm font-medium text-secondary">
               Already have an account?
               <Link
-                href="/login"
+                href={callbackUrl !== "/" ? `/login?callbackUrl=${encodeURIComponent(callbackUrl)}` : "/login"}
                 className="text-main font-black underline underline-offset-4 hover:text-accent transition-colors ml-1"
               >
                 Sign In

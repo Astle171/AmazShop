@@ -47,11 +47,7 @@ export default function PLPProductCard({ product }: PLPProductCardProps) {
     e.preventDefault();
     e.stopPropagation();
     if (product.countInStock <= 0) return;
-    if (isInCart && cartItem) {
-      updateQuantity(cartItem.id, inCartQty + 1);
-    } else {
-      addItem({ productId: product._id, variant: "Standard", quantity: 1 });
-    }
+    addItem({ productId: product._id, variant: "Standard", quantity: 1 });
     addToPLPSession(product._id);
   };
 
@@ -86,7 +82,6 @@ export default function PLPProductCard({ product }: PLPProductCardProps) {
         <HeartIcon size={16} />
       </button>
 
-      {/* Product image area */}
       <Link href={`/product/${product._id}`}>
         <div className="h-56 rounded-2xl bg-bg-light mb-4 flex items-center justify-center relative overflow-hidden">
           {product.image ? (
@@ -94,7 +89,7 @@ export default function PLPProductCard({ product }: PLPProductCardProps) {
               src={product.image}
               alt={product.name}
               fill
-              className="object-contain p-4 transition-transform duration-500 group-hover:scale-110"
+              className="object-contain p-4 transition-transform duration-700 ease-out group-hover:scale-105"
               sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
             />
           ) : (
@@ -126,68 +121,62 @@ export default function PLPProductCard({ product }: PLPProductCardProps) {
             )}
           </div>
           <div className="flex items-center justify-end">
-          {showStepper ? (
-            <div
-              className="flex items-center bg-bg rounded-full p-1 shrink-0"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <button
-                type="button"
-                onClick={handleDecrement}
-                className="w-9 h-9 rounded-full flex items-center justify-center hover:bg-white transition-colors stepper-btn text-main"
-                aria-label="Decrease quantity"
+            <div className="relative h-10 w-[120px]">
+              <div
+                onClick={(e) => e.stopPropagation()}
+                style={{
+                  width: showStepper ? 120 : 40,
+                  transition:
+                    "width 0.4s cubic-bezier(0.32, 0.72, 0, 1), background-color 0.3s ease",
+                }}
+                className={`absolute right-0 top-0 h-10 rounded-full overflow-hidden ${
+                  showStepper ? "bg-bg" : "bg-main"
+                }`}
               >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="14"
-                  height="14"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="3"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <line x1="5" y1="12" x2="19" y2="12" />
-                </svg>
-              </button>
-              <span className="w-8 text-center font-bold text-sm text-main">
-                {inCartQty}
-              </span>
-              <button
-                type="button"
-                onClick={handleAdd}
-                disabled={!canAddMore}
-                className="w-9 h-9 rounded-full bg-main text-white flex items-center justify-center shadow-md stepper-btn disabled:opacity-50 disabled:cursor-not-allowed"
-                aria-label="Increase quantity"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="14"
-                  height="14"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="3"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <line x1="12" y1="5" x2="12" y2="19" />
-                  <line x1="5" y1="12" x2="19" y2="12" />
-                </svg>
-              </button>
+                {showStepper ? (
+                  <div className="flex items-center h-full p-1">
+                    <button
+                      type="button"
+                      onClick={handleDecrement}
+                      className="w-8 h-8 shrink-0 rounded-full flex items-center justify-center text-main hover:bg-white transition-colors"
+                      aria-label="Decrease quantity"
+                    >
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                        <line x1="5" y1="12" x2="19" y2="12" />
+                      </svg>
+                    </button>
+                    <span className="flex-1 text-center font-bold text-sm text-main tabular-nums">
+                      {inCartQty}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={handleAdd}
+                      disabled={!canAddMore}
+                      className="w-8 h-8 shrink-0 rounded-full bg-main text-white flex items-center justify-center shadow-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      aria-label="Increase quantity"
+                    >
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                        <line x1="12" y1="5" x2="12" y2="19" />
+                        <line x1="5" y1="12" x2="19" y2="12" />
+                      </svg>
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={handleAdd}
+                    disabled={product.countInStock <= 0}
+                    className="w-10 h-10 flex items-center justify-center text-white cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+                    aria-label="Add to cart"
+                  >
+                    <svg className="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <line x1="12" y1="5" x2="12" y2="19" />
+                      <line x1="5" y1="12" x2="19" y2="12" />
+                    </svg>
+                  </button>
+                )}
+              </div>
             </div>
-          ) : (
-            <button
-              type="button"
-              onClick={handleAdd}
-              disabled={product.countInStock <= 0}
-              className="w-10 h-10 bg-main text-white rounded-full flex items-center justify-center hover:bg-accent transition-colors text-lg font-bold disabled:opacity-50 disabled:cursor-not-allowed shrink-0"
-              aria-label="Add to cart"
-            >
-              +
-            </button>
-          )}
           </div>
         </div>
       </div>
