@@ -105,6 +105,39 @@ body {
   }
 }
 
+/* Auth pages */
+.brand-side {
+  background-color: var(--color-main);
+}
+
+@media (max-width: 1024px) {
+  .brand-side {
+    display: none;
+  }
+}
+
+.auth-glass-card {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.auth-social-btn {
+  border: 1px solid rgba(45, 36, 30, 0.1);
+  transition: all 0.2s ease;
+}
+
+.auth-social-btn:hover {
+  background-color: #f8f6f4;
+  border-color: var(--color-main);
+}
+
+.auth-input:focus {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 4px rgba(201, 150, 58, 0.1);
+  outline: none;
+}
+
 .pdp-layout {
   display: flex;
   flex-direction: column;
