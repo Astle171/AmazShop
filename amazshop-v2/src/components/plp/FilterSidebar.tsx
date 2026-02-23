@@ -7,6 +7,7 @@ interface FilterSidebarProps {
   categories: PLPCategory[];
   brands: string[];
   selectedBrands: string[];
+  onCategoryClick?: (slug: string) => void;
   onBrandToggle: (brand: string) => void;
   priceRange: [number, number];
   onPriceChange: (range: [number, number]) => void;
@@ -21,6 +22,7 @@ export default function FilterSidebar({
   categories,
   brands,
   selectedBrands,
+  onCategoryClick,
   onBrandToggle,
   priceRange,
   onPriceChange,
@@ -56,18 +58,20 @@ export default function FilterSidebar({
             {categories.map((cat) => (
               <li
                 key={cat.slug}
+                onClick={() => onCategoryClick?.(cat.slug)}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    onCategoryClick?.(cat.slug);
+                  }
+                }}
                 className={`cursor-pointer transition-colors py-2 ${
-                  cat.active
-                    ? "text-accent flex items-center justify-between"
-                    : "hover:text-main"
+                  cat.active ? "text-accent" : "hover:text-main"
                 }`}
               >
-                <span>{cat.name}</span>
-                {cat.active && cat.count > 0 && (
-                  <span className="text-[10px] bg-accent/10 px-1.5 py-0.5 rounded">
-                    {cat.count}
-                  </span>
-                )}
+                {cat.name} ({cat.count})
               </li>
             ))}
           </ul>

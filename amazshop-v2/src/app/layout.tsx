@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import SessionProvider from "@/components/providers/SessionProvider";
+import { CartProvider } from "@/context/CartContext";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -20,7 +21,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="min-h-screen w-full flex flex-col antialiased">
-        <SessionProvider>{children}</SessionProvider>
+        <SessionProvider>
+        <CartProvider>{children}</CartProvider>
+      </SessionProvider>
       </body>
     </html>
   );

@@ -1,6 +1,10 @@
+"use client";
+
 import Link from "next/link";
 import Image from "next/image";
 import { HeartIcon } from "@/components/icons";
+import { useCart } from "@/context/CartContext";
+import { addToPLPSession, isInPLPSession } from "@/lib/plp-session";
 import type { Product } from "@/types";
 
 interface ProductCardProps {
@@ -8,6 +12,39 @@ interface ProductCardProps {
 }
 
 export default function ProductCard({ product }: ProductCardProps) {
+  const { addItem, removeItem, updateQuantity, items } = useCart();
+
+  const cartItem = items.find(
+    (i) => i.productId === product._id && i.variant === "Standard"
+  );
+  const inCartQty = cartItem?.quantity ?? 0;
+  const isInCart = inCartQty > 0;
+  const canAddMore = inCartQty < product.countInStock;
+  const showStepper = isInPLPSession(product._id) && isInCart;
+
+  const handleAdd = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (product.countInStock <= 0) return;
+    if (isInCart && cartItem) {
+      updateQuantity(cartItem.id, inCartQty + 1);
+    } else {
+      addItem({ productId: product._id, variant: "Standard", quantity: 1 });
+    }
+    addToPLPSession(product._id);
+  };
+
+  const handleDecrement = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!cartItem) return;
+    if (inCartQty <= 1) {
+      removeItem(cartItem.id);
+    } else {
+      updateQuantity(cartItem.id, inCartQty - 1);
+    }
+  };
+
   return (
     <article className="group bg-white rounded-3xl p-4 cursor-pointer hover-lift relative overflow-hidden h-full flex flex-col">
       {/* Badge */}
@@ -43,13 +80,20 @@ export default function ProductCard({ product }: ProductCardProps) {
             <div className="w-24 h-24 bg-main/10 rounded-full" />
           )}
 
-          {/* Add to Cart overlay */}
-          <div className="absolute bottom-4 left-0 right-0 flex justify-center card-reveal-btn px-4">
-            <button className="w-full py-3 bg-main text-white text-xs font-bold uppercase tracking-wider rounded-xl shadow-xl hover:bg-accent transition-colors flex items-center justify-center gap-2">
-              <span>Add to Cart</span>
-              <span>+</span>
-            </button>
-          </div>
+          {/* Add to Cart overlay - hidden when stepper is shown below */}
+          {!showStepper && (
+            <div className="absolute bottom-4 left-0 right-0 flex justify-center card-reveal-btn px-4">
+              <button
+                type="button"
+                onClick={handleAdd}
+                disabled={product.countInStock <= 0}
+                className="w-full py-3 bg-main text-white text-xs font-bold uppercase tracking-wider rounded-xl shadow-xl hover:bg-accent transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <span>{product.countInStock <= 0 ? "Out of Stock" : "Add to Cart"}</span>
+                <span>+</span>
+              </button>
+            </div>
+          )}
         </div>
       </Link>
 
@@ -66,29 +110,95 @@ export default function ProductCard({ product }: ProductCardProps) {
         <p className="text-xs text-secondary mb-4 line-clamp-2">
           {product.description}
         </p>
-        <div className="mt-auto flex items-center justify-between">
+        <div className="mt-auto space-y-3">
           <div className="flex items-baseline gap-2">
             <span className="font-black text-lg">
               ${product.price.toLocaleString("en-US", { minimumFractionDigits: 2 })}
             </span>
             {product.originalPrice && (
-              <span className="text-xs text-gray-400 line-through decoration-red-500">
+              <span className="text-xs text-secondary line-through">
                 ${product.originalPrice.toLocaleString("en-US", { minimumFractionDigits: 2 })}
               </span>
             )}
           </div>
-          {product.colors && product.colors.length > 0 && (
-            <div className="flex gap-1">
-              {product.colors.map((color) => (
+          <div className="flex items-center justify-between gap-3">
+            {product.colors && product.colors.length > 0 && (
+              <div className="flex gap-1 shrink-0">
+                {product.colors.map((color) => (
+                  <div
+                    key={color.name}
+                    className="w-4 h-4 rounded-full border border-gray-200"
+                    style={{ backgroundColor: color.hex }}
+                    title={color.name}
+                  />
+                ))}
+              </div>
+            )}
+            <div className="ml-auto shrink-0">
+              {showStepper ? (
                 <div
-                  key={color.name}
-                  className="w-4 h-4 rounded-full border border-gray-200"
-                  style={{ backgroundColor: color.hex }}
-                  title={color.name}
-                />
-              ))}
+                  className="flex items-center bg-bg rounded-full p-1"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <button
+                    type="button"
+                    onClick={handleDecrement}
+                    className="w-9 h-9 rounded-full flex items-center justify-center hover:bg-white transition-colors stepper-btn text-main"
+                    aria-label="Decrease quantity"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="14"
+                      height="14"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="3"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <line x1="5" y1="12" x2="19" y2="12" />
+                    </svg>
+                  </button>
+                  <span className="w-8 text-center font-bold text-sm text-main">
+                    {inCartQty}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={handleAdd}
+                    disabled={!canAddMore}
+                    className="w-9 h-9 rounded-full bg-main text-white flex items-center justify-center shadow-md stepper-btn disabled:opacity-50 disabled:cursor-not-allowed"
+                    aria-label="Increase quantity"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="14"
+                      height="14"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="3"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <line x1="12" y1="5" x2="12" y2="19" />
+                      <line x1="5" y1="12" x2="19" y2="12" />
+                    </svg>
+                  </button>
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  onClick={handleAdd}
+                  disabled={product.countInStock <= 0}
+                  className="w-10 h-10 bg-main text-white rounded-full flex items-center justify-center hover:bg-accent transition-colors text-lg font-bold disabled:opacity-50 disabled:cursor-not-allowed"
+                  aria-label="Add to cart"
+                >
+                  +
+                </button>
+              )}
             </div>
-          )}
+          </div>
         </div>
       </div>
     </article>

@@ -1,7 +1,7 @@
 "use client";
 
 import { Suspense, useState, useMemo, useCallback, useEffect } from "react";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import FilterSidebar from "@/components/plp/FilterSidebar";
 import ActiveFilters, { type FilterTag } from "@/components/plp/ActiveFilters";
 import PLPProductCard from "@/components/plp/PLPProductCard";
@@ -43,6 +43,7 @@ export default function SearchPage() {
 }
 
 function SearchContent() {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const query = searchParams.get("q") || "";
   const categoryParam = searchParams.get("category") || "";
@@ -65,11 +66,14 @@ function SearchContent() {
 
     async function load() {
       try {
-        const { products } = await searchProducts({
+        const { products: allProducts } = await searchProducts({
           query: query || undefined,
-          category: categoryParam || undefined,
         });
         if (cancelled) return;
+
+        const products = categoryParam
+          ? allProducts.filter((p) => p.category === categoryParam)
+          : allProducts;
 
         setAllProducts(products);
 
@@ -77,7 +81,7 @@ function SearchContent() {
         setBrands(uniqueBrands);
 
         const catCounts = new Map<string, number>();
-        products.forEach((p) => {
+        allProducts.forEach((p) => {
           catCounts.set(p.category, (catCounts.get(p.category) || 0) + 1);
         });
         setCategories(
@@ -85,7 +89,7 @@ function SearchContent() {
             name: slug.charAt(0).toUpperCase() + slug.slice(1),
             slug,
             count,
-            active: slug === categoryParam || !categoryParam,
+            active: slug === categoryParam,
           }))
         );
 
@@ -167,6 +171,20 @@ function SearchContent() {
     return tags;
   }, [selectedBrands, activeTags]);
 
+  const handleCategoryClick = useCallback(
+    (slug: string) => {
+      const params = new URLSearchParams(searchParams.toString());
+      if (categoryParam === slug) {
+        params.delete("category");
+      } else {
+        params.set("category", slug);
+      }
+      params.delete("page");
+      router.push(`/search?${params.toString()}`);
+    },
+    [router, searchParams, categoryParam]
+  );
+
   const handleBrandToggle = useCallback((brand: string) => {
     setSelectedBrands((prev) =>
       prev.includes(brand) ? prev.filter((b) => b !== brand) : [...prev, brand]
@@ -202,6 +220,7 @@ function SearchContent() {
         categories={categories}
         brands={brands}
         selectedBrands={selectedBrands}
+        onCategoryClick={handleCategoryClick}
         onBrandToggle={handleBrandToggle}
         priceRange={priceRange}
         onPriceChange={setPriceRange}
