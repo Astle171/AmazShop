@@ -12,10 +12,10 @@ export default function CategorySection({ categories }: CategorySectionProps) {
       <div className="flex items-center justify-between mb-8">
         <h2 className="text-2xl font-bold">Shop by Category</h2>
         <div className="flex gap-2">
-          <button className="w-8 h-8 rounded-full border border-main/10 flex items-center justify-center hover:bg-main hover:text-white transition-colors">
+          <button className="w-10 h-10 rounded-full border border-main/10 flex items-center justify-center hover:bg-main hover:text-white transition-colors">
             <ChevronLeftIcon />
           </button>
-          <button className="w-8 h-8 rounded-full border border-main/10 flex items-center justify-center hover:bg-main hover:text-white transition-colors">
+          <button className="w-10 h-10 rounded-full border border-main/10 flex items-center justify-center hover:bg-main hover:text-white transition-colors">
             <ChevronRightIcon />
           </button>
         </div>

@@ -15,7 +15,7 @@ export default function ProductGallery({ images, badgeText }: ProductGalleryProp
   return (
     <div className="space-y-6">
       {/* Main image */}
-      <div className="aspect-[4/3] bg-white rounded-[40px] flex items-center justify-center relative overflow-hidden shadow-soft group">
+      <div className="aspect-[4/3] bg-white rounded-2xl sm:rounded-[40px] flex items-center justify-center relative overflow-hidden shadow-soft group">
         {badgeText && (
           <div className="absolute top-6 left-6 flex flex-col gap-2 z-10">
             <span className="bg-accent text-white text-[10px] font-black px-3 py-1.5 rounded-full tracking-widest uppercase">
@@ -28,7 +28,7 @@ export default function ProductGallery({ images, badgeText }: ProductGalleryProp
             src={galleryImages[activeIndex]}
             alt="Product image"
             fill
-            className="object-contain p-8 transition-transform duration-700 group-hover:scale-105"
+            className="object-contain p-4 sm:p-8 transition-transform duration-700 group-hover:scale-105"
             sizes="(max-width: 768px) 100vw, 50vw"
             priority
           />
@@ -39,7 +39,7 @@ export default function ProductGallery({ images, badgeText }: ProductGalleryProp
 
       {/* Thumbnails */}
       {galleryImages.length > 1 && (
-        <div className="grid grid-cols-4 gap-4">
+        <div className="grid grid-cols-4 gap-2 sm:gap-4">
           {galleryImages.map((img, index) => (
             <button
               key={index}

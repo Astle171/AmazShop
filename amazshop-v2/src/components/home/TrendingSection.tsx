@@ -25,15 +25,15 @@ export default function TrendingSection({ products }: TrendingSectionProps) {
 
   return (
     <section>
-      <div className="flex items-center justify-between mb-8">
-        <div className="flex items-center gap-6">
-          <h2 className="text-2xl font-bold">Trending Now</h2>
-          <div className="hidden md:flex bg-white rounded-full p-1 border border-main/10">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6 md:mb-8">
+        <div className="flex items-center gap-4 md:gap-6">
+          <h2 className="text-xl md:text-2xl font-bold">Trending Now</h2>
+          <div className="flex bg-white rounded-full p-1 border border-main/10">
             {FILTERS.map((filter) => (
               <button
                 key={filter}
                 onClick={() => setActiveFilter(filter)}
-                className={`px-4 py-1.5 rounded-full text-xs font-bold transition-colors ${
+                className={`px-3 md:px-4 py-1.5 rounded-full text-xs font-bold transition-colors ${
                   activeFilter === filter
                     ? "bg-main text-white shadow-md"
                     : "text-secondary hover:text-main"
@@ -46,7 +46,7 @@ export default function TrendingSection({ products }: TrendingSectionProps) {
         </div>
         <Link
           href="/search"
-          className="text-sm font-bold text-accent hover:text-main transition-colors"
+          className="text-sm font-bold text-accent hover:text-main transition-colors py-2"
         >
           View All Products →
         </Link>

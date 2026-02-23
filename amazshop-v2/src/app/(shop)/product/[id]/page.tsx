@@ -48,10 +48,15 @@ export default async function ProductDetailPage({ params }: PageProps) {
             images={product.images}
             badgeText={product.badgeText}
           />
-          <SpecsSection specs={product.specs} />
+          <div className="hidden md:block">
+            <SpecsSection specs={product.specs} />
+          </div>
         </div>
         <div className="pdp-info">
           <ProductInfo product={product} />
+        </div>
+        <div className="md:hidden">
+          <SpecsSection specs={product.specs} />
         </div>
       </div>
 

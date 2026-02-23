@@ -24,7 +24,7 @@ export default function ProductCard({ product }: ProductCardProps) {
       )}
 
       {/* Wishlist button */}
-      <button className="absolute top-4 right-4 z-10 w-8 h-8 rounded-full bg-white/80 backdrop-blur text-main flex items-center justify-center hover:bg-accent hover:text-white transition-colors opacity-0 group-hover:opacity-100">
+      <button className="absolute top-4 right-4 z-10 w-10 h-10 rounded-full bg-white/80 backdrop-blur text-main flex items-center justify-center hover:bg-accent hover:text-white transition-colors opacity-100 md:opacity-0 md:group-hover:opacity-100">
         <HeartIcon size={16} />
       </button>
 
@@ -82,7 +82,7 @@ export default function ProductCard({ product }: ProductCardProps) {
               {product.colors.map((color) => (
                 <div
                   key={color.name}
-                  className="w-3 h-3 rounded-full border border-gray-200"
+                  className="w-4 h-4 rounded-full border border-gray-200"
                   style={{ backgroundColor: color.hex }}
                   title={color.name}
                 />

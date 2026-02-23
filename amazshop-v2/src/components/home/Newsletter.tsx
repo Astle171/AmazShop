@@ -1,6 +1,6 @@
 export default function Newsletter() {
   return (
-    <section className="mt-20 bg-main rounded-[32px] p-8 md:p-16 text-center relative overflow-hidden">
+    <section className="mt-12 md:mt-20 bg-main rounded-2xl md:rounded-[32px] p-6 md:p-16 text-center relative overflow-hidden">
       <div className="absolute inset-0 opacity-10">
         <svg
           className="w-full h-full"

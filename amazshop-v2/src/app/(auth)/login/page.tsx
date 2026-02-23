@@ -49,9 +49,9 @@ export default function LoginPage() {
       <BrandPanel />
 
       {/* Form Side */}
-      <div className="flex-1 bg-white flex flex-col justify-center items-center p-8 lg:p-16 relative">
-        <div className="absolute top-8 right-8 lg:top-12 lg:right-16 flex items-center gap-4">
-          <span className="text-xs font-bold text-secondary hidden sm:inline">
+      <div className="flex-1 bg-white flex flex-col items-center p-6 md:p-8 lg:p-16 relative overflow-y-auto">
+        <div className="hidden lg:flex absolute top-12 right-16 items-center gap-4">
+          <span className="text-xs font-bold text-secondary">
             Need help?
           </span>
           <Link
@@ -62,14 +62,17 @@ export default function LoginPage() {
           </Link>
         </div>
 
-        <div className="w-full max-w-[420px]">
-          <div className="mb-10 text-center lg:text-left">
-            <div className="lg:hidden flex justify-center mb-8">
-              <div className="w-12 h-12 bg-main text-white rounded-xl flex items-center justify-center font-black text-2xl">
-                A
-              </div>
-            </div>
-            <h2 className="text-4xl font-black tracking-tighter mb-2">
+        <div className="w-full max-w-[420px] flex-1 flex flex-col justify-center">
+          <div className="lg:hidden flex justify-end mb-4">
+            <Link
+              href="#"
+              className="text-[10px] font-black tracking-widest text-main hover:text-accent transition-colors underline underline-offset-4"
+            >
+              CONTACT SUPPORT
+            </Link>
+          </div>
+          <div className="mb-8 md:mb-10 text-center lg:text-left">
+            <h2 className="text-3xl md:text-4xl font-black tracking-tighter mb-2">
               Welcome back.
             </h2>
             <p className="text-secondary font-medium">
@@ -128,7 +131,7 @@ export default function LoginPage() {
                 </label>
                 <Link
                   href="#"
-                  className="text-[10px] font-bold text-accent hover:underline"
+                  className="text-xs font-bold text-accent hover:underline py-1"
                 >
                   FORGOT PASSWORD?
                 </Link>
@@ -167,7 +170,7 @@ export default function LoginPage() {
         </div>
 
         <div className="mt-auto pt-10 text-center lg:text-left w-full max-w-[420px]">
-          <p className="text-[10px] text-secondary/60 leading-relaxed">
+          <p className="text-xs text-secondary/60 leading-relaxed">
             By continuing, you agree to Amazshop&apos;s{" "}
             <Link href="#" className="underline">
               Terms of Service
