@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useCart } from "@/context/CartContext";
 import { getProductById } from "@/lib/product-lookup";
-import { computeOrderTotals } from "@/data/coupons";
+import { computeOrderTotals, getCouponByCode } from "@/data/coupons";
 import Link from "next/link";
 import Image from "next/image";
 import StripeProvider from "@/components/providers/StripeProvider";
@@ -436,7 +436,12 @@ export default function CheckoutPage() {
     postal: "",
   });
 
-  const totals = computeOrderTotals(subtotal, null);
+  const storedCode =
+    typeof window !== "undefined"
+      ? localStorage.getItem("amazshop-applied-coupon")
+      : null;
+  const appliedCoupon = storedCode ? getCouponByCode(storedCode) : null;
+  const totals = computeOrderTotals(subtotal, appliedCoupon);
 
   const handlePaymentState = useCallback((ready: boolean, loading: boolean) => {
     setPaymentReady(ready);
@@ -447,10 +452,14 @@ export default function CheckoutPage() {
     setIntentLoading(true);
     setIntentError(null);
     try {
+      const couponCode =
+        typeof window !== "undefined"
+          ? localStorage.getItem("amazshop-applied-coupon") ?? undefined
+          : undefined;
       const res = await fetch("/api/checkout/create-payment-intent", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: "{}",
+        body: JSON.stringify({ couponCode }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed to create payment");

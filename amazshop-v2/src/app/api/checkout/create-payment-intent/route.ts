@@ -5,11 +5,14 @@ import { prisma } from "@/lib/prisma";
 import { getProductById } from "@/lib/product-lookup";
 import { computeOrderTotals, getCouponByCode } from "@/data/coupons";
 
-export async function POST(_request: Request) {
+export async function POST(request: Request) {
   const session = await auth();
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
+
+  const body = await request.json().catch(() => ({}));
+  const couponCode: string | undefined = body.couponCode;
 
   const cart = await prisma.cart.findUnique({
     where: { userId: session.user.id },
@@ -27,7 +30,7 @@ export async function POST(_request: Request) {
     subtotal += product.price * item.quantity;
   }
 
-  const coupon = cart.couponCode ? getCouponByCode(cart.couponCode) : null;
+  const coupon = couponCode ? getCouponByCode(couponCode) : null;
   const totals = computeOrderTotals(subtotal, coupon);
   const amountInCents = Math.round(totals.total * 100);
 
@@ -45,7 +48,7 @@ export async function POST(_request: Request) {
     metadata: {
       userId: session.user.id,
       cartId: cart.id,
-      couponCode: cart.couponCode ?? "",
+      couponCode: couponCode ?? "",
       subtotal: Math.round(subtotal * 100).toString(),
       shipping: Math.round(totals.shippingAfterDiscount * 100).toString(),
       tax: Math.round(totals.taxEstimate * 100).toString(),
