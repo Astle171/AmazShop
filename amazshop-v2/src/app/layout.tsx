@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
-import Navbar from "@/components/layout/Navbar";
-import Footer from "@/components/layout/Footer";
+import SessionProvider from "@/components/providers/SessionProvider";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -21,11 +20,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="min-h-screen w-full flex flex-col antialiased">
-        <Navbar />
-        <main className="flex-1 max-w-[1400px] w-full mx-auto px-6 py-8">
-          {children}
-        </main>
-        <Footer />
+        <SessionProvider>{children}</SessionProvider>
       </body>
     </html>
   );

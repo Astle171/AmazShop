@@ -3,12 +3,53 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
+import { useSession, signOut } from "next-auth/react";
 import { SearchIcon, HeartIcon, ShoppingBagIcon } from "@/components/icons";
+
+function UserAvatar({ name, image }: { name?: string | null; image?: string | null }) {
+  if (image) {
+    return (
+      <Image
+        src={image}
+        alt={name || "User"}
+        width={40}
+        height={40}
+        className="h-10 w-10 rounded-full object-cover"
+      />
+    );
+  }
+
+  const initials = (name || "U")
+    .split(" ")
+    .map((w) => w[0])
+    .join("")
+    .toUpperCase()
+    .slice(0, 2);
+
+  return (
+    <div className="h-10 w-10 rounded-full bg-accent text-white flex items-center justify-center text-xs font-black">
+      {initials}
+    </div>
+  );
+}
 
 export default function Navbar() {
   const router = useRouter();
+  const { data: session, status } = useSession();
   const [query, setQuery] = useState("");
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setMenuOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -54,12 +95,46 @@ export default function Navbar() {
         </form>
 
         <div className="flex items-center gap-2">
-          <Link
-            href="/login"
-            className="h-10 px-4 rounded-full hover:bg-main/5 text-sm font-bold transition-colors hidden lg:flex items-center"
-          >
-            Sign In
-          </Link>
+          {status === "loading" ? (
+            <div className="h-10 w-20 rounded-full bg-main/5 animate-pulse hidden lg:block" />
+          ) : session?.user ? (
+            <div className="relative hidden lg:block" ref={menuRef}>
+              <button
+                onClick={() => setMenuOpen(!menuOpen)}
+                className="flex items-center gap-3 h-10 pl-1 pr-4 rounded-full hover:bg-main/5 transition-colors cursor-pointer"
+              >
+                <UserAvatar name={session.user.name} image={session.user.image} />
+                <span className="text-sm font-bold max-w-[120px] truncate">
+                  {session.user.name?.split(" ")[0] || "Account"}
+                </span>
+              </button>
+
+              {menuOpen && (
+                <div className="absolute right-0 top-14 w-56 bg-white rounded-2xl shadow-xl shadow-main/10 border border-main/5 p-2 z-50">
+                  <div className="px-4 py-3 border-b border-main/5">
+                    <p className="text-sm font-bold truncate">{session.user.name}</p>
+                    <p className="text-xs text-secondary truncate">{session.user.email}</p>
+                  </div>
+                  <button
+                    onClick={() => {
+                      setMenuOpen(false);
+                      signOut({ callbackUrl: "/" });
+                    }}
+                    className="w-full text-left px-4 py-3 text-sm font-bold text-red-500 hover:bg-red-50 rounded-xl transition-colors mt-1 cursor-pointer"
+                  >
+                    Sign Out
+                  </button>
+                </div>
+              )}
+            </div>
+          ) : (
+            <Link
+              href="/login"
+              className="h-10 px-4 rounded-full hover:bg-main/5 text-sm font-bold transition-colors hidden lg:flex items-center"
+            >
+              Sign In
+            </Link>
+          )}
           <button className="h-12 w-12 rounded-full border border-main/10 flex items-center justify-center hover:border-accent hover:text-accent transition-all relative">
             <HeartIcon />
           </button>
